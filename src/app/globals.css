@@ -3,13 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Reset dasar */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 /* Font-face untuk SF Pro Display */
 @font-face {
   font-family: 'SF Pro Display';
