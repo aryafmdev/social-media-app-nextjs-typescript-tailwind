@@ -111,9 +111,9 @@ export default function RegisterPage() {
           <Button type='submit' loading={mutation.isPending}>
             Submit
           </Button>
-          <p className='text-sm text-neutral-300 text-center'>
+          <p className='text-sm md:text-md font-semibold text-neutral-300 text-center'>
             Already have an account?{' '}
-            <a href='/login' className='text-primary-200 font-medium'>
+            <a href='/login' className='text-primary-200 text-sm md:text-md font-bold'>
               Log in
             </a>
           </p>

@@ -54,7 +54,7 @@ export default function LoginPage() {
       title='Welcome Back!'
       className="w-[clamp(345px,30.97vw,446px)]">
         <form
-          className='flex flex-col gap-xl md:gap-3xl w-[clamp(313px,27.63vw,398px)] justify-self-center'
+          className='flex flex-col text-md font-regular gap-xl md:gap-3xl w-[clamp(313px,27.63vw,398px)] justify-self-center'
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <TextField
@@ -74,9 +74,9 @@ export default function LoginPage() {
           <Button type='submit' loading={mutation.isPending}>
             Login
           </Button>
-          <p className='text-sm text-neutral-300 text-center'>
+          <p className='text-sm md:text-md font-semibold text-neutral-300 text-center'>
             Don`t have an account?{' '}
-            <a href='/register' className='text-primary-200 font-medium'>
+            <a href='/register' className='text-primary-200 text-sm md:text-md font-bold'>
               Register
             </a>
           </p>

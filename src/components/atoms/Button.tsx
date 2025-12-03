@@ -8,7 +8,7 @@ export default function Button({ loading, className = "", ...props }: Props) {
   return (
     <button
       {...props}
-      className={`rounded-full bg-primary-200 text-neutral-25 px-lg py-sm font-semibold disabled:opacity-60 ${className}`}
+      className={`rounded-full bg-primary-300 text-neutral-25 px-lg py-sm text-md font-bold disabled:opacity-60 ${className}`}
     >
       {loading ? "Loading..." : props.children}
     </button>

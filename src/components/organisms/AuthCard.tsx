@@ -1,6 +1,7 @@
 'use client';
 import { ReactNode } from "react";
-import { cn } from "../../lib/utils"; // util tailwind-merge + clsx
+import { cn } from "../../lib/utils";
+import Image from "next/image";
 
 type Props = {
   title: string;
@@ -12,14 +13,21 @@ export default function AuthCard({ title, children, className }: Props) {
   return (
     <div
       className={cn(
-        "rounded-xl bg-neutral-900/80 backdrop-blur py-4xl border border-neutral-800",
+        "rounded-xl bg-neutral-900/20 backdrop-blur-5xl py-4xl border border-neutral-900",
         className
       )}
     >
       <div className="flex flex-col items-center text-center">
-        
-        <h1 className="font-display text-display-md text-neutral-25">Sociality</h1>
-        <p className="font-display text-lg text-neutral-200">{title}</p>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/assets/images/logo-sociality.png"
+            alt="Logo Sociality"
+            width={30}
+            height={30}
+          />
+        <h1 className="font-display font-bold text-display-xs text-neutral-25">Sociality</h1>
+        </div>
+        <p className="font-display font-bold text-xl md:text-display-xs text-neutral-200">{title}</p>
       </div>
       {children}
     </div>
