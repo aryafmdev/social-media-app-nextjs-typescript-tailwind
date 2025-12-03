@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { publicApiBaseUrl } from "../../../../lib/env";
 
 const RegisterSchema = z.object({
   name: z.string().min(2),
@@ -18,10 +19,15 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+  if (publicApiBaseUrl) {
+    const res = await fetch(`${publicApiBaseUrl}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsed.data),
+    });
+    const json = await res.json().catch(() => ({}));
+    return NextResponse.json(json, { status: res.status });
+  }
   const { name, username, email, phone } = parsed.data;
-  return NextResponse.json(
-    { message: "Registered", user: { name, username, email, phone } },
-    { status: 201 }
-  );
+  return NextResponse.json({ message: "Registered", user: { name, username, email, phone } }, { status: 201 });
 }
-

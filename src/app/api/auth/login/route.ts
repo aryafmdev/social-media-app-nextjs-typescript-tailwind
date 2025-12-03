@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { publicApiBaseUrl } from "../../../../lib/env";
 
 const LoginSchema = z.object({
   email: z.string().email(),
@@ -15,9 +16,14 @@ export async function POST(req: Request) {
       { status: 401 }
     );
   }
-  return NextResponse.json(
-    { token: "mock-token", message: "Login success" },
-    { status: 200 }
-  );
+  if (publicApiBaseUrl) {
+    const res = await fetch(`${publicApiBaseUrl}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsed.data),
+    });
+    const json = await res.json().catch(() => ({}));
+    return NextResponse.json(json, { status: res.status });
+  }
+  return NextResponse.json({ token: "mock-token", message: "Login success" }, { status: 200 });
 }
-
