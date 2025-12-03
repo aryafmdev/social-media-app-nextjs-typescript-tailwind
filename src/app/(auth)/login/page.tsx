@@ -12,6 +12,7 @@ import AuthCard from '../../../components/organisms/AuthCard';
 import TextField from '../../../components/molecules/TextField';
 import PasswordField from '../../../components/molecules/PasswordField';
 import Button from '../../../components/atoms/Button';
+import AlertBanner from '../../../components/organisms/AlertBanner';
 
 const LoginSchema = z.object({
   email: z.string().email({ message: 'Email tidak valid' }),
@@ -50,9 +51,10 @@ export default function LoginPage() {
 
   return (
     <AuthTemplate>
-      <AuthCard 
-      title='Welcome Back!'
-      className="w-[clamp(345px,30.97vw,446px)]">
+      <AuthCard
+        title='Welcome Back!'
+        className='w-[clamp(345px,30.97vw,446px)]'
+      >
         <form
           className='flex flex-col text-md font-regular gap-xl md:gap-3xl w-[clamp(313px,27.63vw,398px)] justify-self-center'
           onSubmit={form.handleSubmit(onSubmit)}
@@ -74,9 +76,22 @@ export default function LoginPage() {
           <Button type='submit' loading={mutation.isPending}>
             Login
           </Button>
+          {mutation.isError && (
+            <div className='mt-xl'>
+              <AlertBanner label='Login gagal' variant='danger' />
+            </div>
+          )}
+          {mutation.isSuccess && (
+            <div className='mt-xl'>
+              <AlertBanner label='Login success' variant='success' />
+            </div>
+          )}
           <p className='text-sm md:text-md font-semibold text-neutral-300 text-center'>
             Don`t have an account?{' '}
-            <a href='/register' className='text-primary-200 text-sm md:text-md font-bold'>
+            <a
+              href='/register'
+              className='text-primary-200 text-sm md:text-md font-bold'
+            >
               Register
             </a>
           </p>

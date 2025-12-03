@@ -9,6 +9,7 @@ import AuthCard from '../../../components/organisms/AuthCard';
 import TextField from '../../../components/molecules/TextField';
 import PasswordField from '../../../components/molecules/PasswordField';
 import Button from '../../../components/atoms/Button';
+import AlertBanner from '../../../components/organisms/AlertBanner';
 
 const RegisterSchema = z
   .object({
@@ -111,6 +112,12 @@ export default function RegisterPage() {
           <Button type='submit' loading={mutation.isPending}>
             Submit
           </Button>
+          {mutation.isError && (
+            <div className='mt-xl'><AlertBanner label='Register gagal' variant='danger' /></div>
+          )}
+          {mutation.isSuccess && (
+            <div className='mt-xl'><AlertBanner label='Registered' variant='success' /></div>
+          )}
           <p className='text-sm md:text-md font-semibold text-neutral-300 text-center'>
             Already have an account?{' '}
             <a href='/login' className='text-primary-200 text-sm md:text-md font-bold'>

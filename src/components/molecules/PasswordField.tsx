@@ -2,7 +2,12 @@
 import { useState } from 'react';
 import Input from '../atoms/Input';
 import HelperText from '../atoms/HelperText';
-import { FieldError, FieldValues, Path, UseFormRegister } from 'react-hook-form';
+import {
+  FieldError,
+  FieldValues,
+  Path,
+  UseFormRegister,
+} from 'react-hook-form';
 import { Icon } from '@iconify/react';
 
 type Props<T extends FieldValues> = {
@@ -38,9 +43,9 @@ export default function PasswordField<T extends FieldValues>({
           onClick={() => setShow((s) => !s)}
         >
           {show ? (
-            <Icon icon="iconamoon:eye-off" className="size-5" />
+            <Icon icon='iconamoon:eye-off' className='size-5' />
           ) : (
-            <Icon icon="iconamoon:eye" className="size-5" />
+            <Icon icon='iconamoon:eye' className='size-5' />
           )}
         </button>
       </div>
