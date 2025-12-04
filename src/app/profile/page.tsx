@@ -14,6 +14,7 @@ import { RootState } from '../../store';
 import { useQuery } from '@tanstack/react-query';
 import { getMe, getMyPosts } from '../../lib/api/me';
 import ProfileEditForm from '../../components/molecules/ProfileEditForm';
+import { loadAuth } from '../../lib/authStorage';
 
 export default function ProfilePage() {
   const token = useSelector((s: RootState) => s.auth.token);
@@ -25,7 +26,8 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
-    if (!token) router.replace('/login');
+    const saved = loadAuth();
+    if (!token && !saved?.token) router.replace('/login');
   }, [token, router]);
 
   const [isMdUp, setIsMdUp] = useState(false);

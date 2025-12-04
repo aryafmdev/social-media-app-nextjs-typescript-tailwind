@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Header from "./Header";
 import { RootState } from "../../store";
 import { setMobileAuthOpen } from "../../store/uiSlice";
+import { loadAuth } from "../../lib/authStorage";
 
 export default function HeaderSmart() {
   const dispatch = useDispatch();
@@ -19,12 +20,12 @@ export default function HeaderSmart() {
     return () => mq.removeEventListener("change", update);
   }, []);
 
+  const hasToken = token || (typeof window !== "undefined" ? loadAuth()?.token : undefined);
   const variant = (() => {
-    if (isMdUp) return token ? "after-login" : "before-login";
-    if (token) return "after-login-mobile";
+    if (isMdUp) return hasToken ? "after-login" : "before-login";
+    if (hasToken) return "after-login-mobile";
     return mobileAuthOpen ? "open-auth-mobile" : "before-login-mobile";
   })();
 
   return <Header variant={variant} onToggleMenu={() => dispatch(setMobileAuthOpen(!mobileAuthOpen))} />;
 }
-
