@@ -13,8 +13,8 @@ import MenuBar from '../../components/molecules/MenuBar';
 import { RootState } from '../../store';
 import { useQuery } from '@tanstack/react-query';
 import { getMe, getMyPosts } from '../../lib/api/me';
-import ProfileEditForm from '../../components/molecules/ProfileEditForm';
 import { loadAuth } from '../../lib/authStorage';
+import AlertBanner from '../../components/organisms/AlertBanner';
 
 export default function ProfilePage() {
   const token = useSelector((s: RootState) => s.auth.token);
@@ -23,7 +23,6 @@ export default function ProfilePage() {
   const [hasPostsOverride, setHasPostsOverride] = useState<boolean | null>(
     null
   );
-  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     const saved = loadAuth();
@@ -61,8 +60,13 @@ export default function ProfilePage() {
           username={me.data?.username}
           avatarUrl={me.data?.avatarUrl}
           stats={me.data?.stats}
-          onEdit={() => setEditing((v) => !v)}
+          onEdit={() => router.push('/profile/edit')}
         />
+        {typeof window !== 'undefined' &&
+          new URLSearchParams(window.location.search).get('updated') ===
+            '1' && (
+            <AlertBanner variant='success' label='Profile Success Update' />
+          )}
         <ProfileTabs active={tab} onChange={setTab} />
         <ProfileContent
           tab={tab}
@@ -70,12 +74,6 @@ export default function ProfilePage() {
           onUpload={() => setHasPostsOverride(true)}
           items={posts.data?.items}
         />
-        {editing && me.data && (
-          <ProfileEditForm
-            me={me.data}
-            onDoneAction={() => setEditing(false)}
-          />
-        )}
       </ProfileTemplate>
       <div className='fixed inset-x-0 bottom-10 flex justify-center'>
         <MenuBar />

@@ -1,6 +1,7 @@
 export type Me = {
   name: string;
   username: string;
+  email?: string;
   phone?: string;
   bio?: string;
   avatarUrl?: string;
@@ -65,4 +66,3 @@ export async function getMyPosts(token: string, page = 1, limit = 20): Promise<{
   if (!res.ok) throw new Error("Failed to fetch my posts");
   return res.json();
 }
-

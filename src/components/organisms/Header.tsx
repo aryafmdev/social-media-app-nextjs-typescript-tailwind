@@ -1,8 +1,13 @@
+'use client';
 import Brand from '../atoms/Brand';
 import IconButton from '../atoms/IconButton';
 import Avatar from '../atoms/Avatar';
 import SearchBar from '../molecules/SearchBar';
 import { Icon } from '@iconify/react';
+import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { clearAuth } from '../../store/authSlice';
+import { clearAuthStorage } from '../../lib/authStorage';
 
 type Variant =
   | 'before-login'
@@ -15,11 +20,13 @@ type Variant =
 
 export default function Header({
   variant = 'before-login',
-  onToggleMenu,
+  onToggleMenuAction,
 }: {
   variant?: Variant;
-  onToggleMenu?: () => void;
+  onToggleMenuAction?: () => void;
 }) {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const base = 'bg-black sticky top-0 z-50';
   const desktop = 'h-[80px] px-6';
   const mobile = 'h-[64px]';
@@ -35,7 +42,7 @@ export default function Header({
             <IconButton>
               <Icon icon='lucide:search' />
             </IconButton>
-            <IconButton onClick={onToggleMenu}>
+            <IconButton onClick={onToggleMenuAction}>
               <Icon icon='lucide:menu' />
             </IconButton>
           </div>
@@ -60,7 +67,7 @@ export default function Header({
 
   if (variant === 'search') {
     return (
-      <header className={`${base} ${mobile} flex flex-row items-center`}>
+      <header className={`${base} ${mobile} flex flex-row items-center px-xl`}>
         <SearchBar />
       </header>
     );
@@ -69,7 +76,7 @@ export default function Header({
   if (variant === 'before-login') {
     return (
       <header
-        className={`${base} ${desktop} flex flex-row justify-between items-center`}
+        className={`${base} ${desktop} flex flex-row justify-between items-center px-xl`}
       >
         <Brand />
         <div className='flex-1 flex justify-center'>
@@ -105,7 +112,7 @@ export default function Header({
           <IconButton>
             <Icon icon='lucide:search' />
           </IconButton>
-          <IconButton onClick={onToggleMenu}>
+          <IconButton onClick={onToggleMenuAction}>
             <Icon icon='lucide:menu' />
           </IconButton>
         </div>
@@ -116,7 +123,7 @@ export default function Header({
   if (variant === 'after-login') {
     return (
       <header
-        className={`${base} ${desktop} flex flex-row justify-between items-center`}
+        className={`${base} ${desktop} flex flex-row justify-between items-center px-xl`}
       >
         <Brand />
         <div className='flex-1 flex justify-center'>
@@ -130,6 +137,16 @@ export default function Header({
           </IconButton>
           <Avatar />
           <span className='text-neutral-25 font-medium'>John Doe</span>
+          <IconButton
+            onClick={() => {
+              clearAuthStorage();
+              dispatch(clearAuth());
+              router.push('/login');
+            }}
+            aria-label='Logout'
+          >
+            <Icon icon='lucide:log-out' />
+          </IconButton>
         </div>
       </header>
     );
@@ -138,7 +155,7 @@ export default function Header({
   if (variant === 'after-login-mobile') {
     return (
       <header
-        className={`${base} ${mobile} flex flex-row justify-between items-center`}
+        className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
       >
         <Brand />
         <div className='flex items-center gap-md'>
@@ -146,6 +163,16 @@ export default function Header({
             <Icon icon='lucide:search' />
           </IconButton>
           <Avatar />
+          <IconButton
+            onClick={() => {
+              clearAuthStorage();
+              dispatch(clearAuth());
+              router.push('/login');
+            }}
+            aria-label='Logout'
+          >
+            <Icon icon='lucide:log-out' />
+          </IconButton>
         </div>
       </header>
     );
@@ -154,12 +181,22 @@ export default function Header({
   if (variant === 'mobile-profile') {
     return (
       <header
-        className={`${base} ${mobile} flex flex-row justify-between items-center`}
+        className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
       >
         <button className='text-neutral-25'>←</button>
         <div className='flex items-center gap-md'>
           <span className='text-neutral-25'>John Doe</span>
           <Avatar />
+          <IconButton
+            onClick={() => {
+              clearAuthStorage();
+              dispatch(clearAuth());
+              router.push('/login');
+            }}
+            aria-label='Logout'
+          >
+            <Icon icon='lucide:log-out' />
+          </IconButton>
         </div>
       </header>
     );

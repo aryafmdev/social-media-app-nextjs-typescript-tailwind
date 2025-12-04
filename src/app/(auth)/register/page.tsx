@@ -3,6 +3,9 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
+import { setAuth } from '../../../store/authSlice';
+import { saveAuth } from '../../../lib/authStorage';
 import { useRouter } from 'next/navigation';
 import AuthTemplate from '../../../components/templates/AuthTemplate';
 import AuthCard from '../../../components/organisms/AuthCard';
@@ -33,6 +36,7 @@ export default function RegisterPage() {
     mode: 'onChange',
   });
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const mutation = useMutation({
     mutationFn: async (data: RegisterValues) => {
@@ -51,8 +55,23 @@ export default function RegisterPage() {
       if (!res.ok) throw new Error('Register gagal');
       return res.json();
     },
-    onSuccess: () => {
-      router.push('/login');
+    onSuccess: async (_, variables) => {
+      const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: variables.email, password: variables.password }),
+      });
+      if (loginRes.ok) {
+        const loginJson = await loginRes.json();
+        const token: string | undefined = loginJson?.token;
+        dispatch(
+          setAuth({ token, user: { email: variables.email, name: variables.name, username: variables.username, phone: variables.phone } })
+        );
+        saveAuth(token, { email: variables.email, name: variables.name, username: variables.username, phone: variables.phone });
+        router.push('/profile/edit');
+      } else {
+        router.push('/login');
+      }
     },
   });
 
