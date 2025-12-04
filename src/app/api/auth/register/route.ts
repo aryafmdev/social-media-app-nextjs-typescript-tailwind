@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     );
   }
   if (publicApiBaseUrl) {
-    const res = await fetch(`${publicApiBaseUrl}/auth/register`, {
+    const res = await fetch(`${publicApiBaseUrl}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed.data),

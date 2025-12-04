@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
   if (publicApiBaseUrl) {
-    const res = await fetch(`${publicApiBaseUrl}/auth/login`, {
+    const res = await fetch(`${publicApiBaseUrl}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(parsed.data),
