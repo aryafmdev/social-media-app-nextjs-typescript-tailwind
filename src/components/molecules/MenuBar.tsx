@@ -11,10 +11,10 @@ export default function MenuBar() {
   const token = useSelector((s: RootState) => s.auth.token);
   const saved = typeof window !== "undefined" ? loadAuth() : undefined;
   return (
-    <div className="rounded-full bg-neutral-900 border border-neutral-800 w-[clamp(320px,90vw,360px)] md:w-[680px] px-5xl md:px-8xl py-xl md:py-2xl flex items-center justify-between">
-      <button onClick={() => router.push("/")}><MenuItem icon="lucide:home" label="Home" active /></button>
+    <div className="rounded-full bg-neutral-900 border border-neutral-800 w-[clamp(345px,25vw,360px)] h-[clamp(64px, 58px + 1.527vw, 80px)] px-5xl py-md flex items-center justify-between">
+      <button onClick={() => router.push("/")}><MenuItem icon="solar:home-2-bold" label="Home" active /></button>
       <Fab />
-      <button onClick={() => router.push(token || saved?.token ? "/profile" : "/login")}><MenuItem icon="lucide:user" label="Profile" /></button>
+      <button onClick={() => router.push(token || saved?.token ? "/profile" : "/login")}><MenuItem icon="typcn:user" label="Profile" /></button>
     </div>
   );
 }

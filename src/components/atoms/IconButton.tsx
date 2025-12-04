@@ -4,7 +4,7 @@ export default function IconButton({ className = "", ...props }: ButtonHTMLAttri
   return (
     <button
       {...props}
-      className={`w-6 h-6 flex items-center justify-center text-neutral-300 hover:text-neutral-25 ${className}`}
+      className={`size-6 flex items-center justify-center text-neutral-300 hover:text-neutral-25 ${className}`}
     />
   );
 }

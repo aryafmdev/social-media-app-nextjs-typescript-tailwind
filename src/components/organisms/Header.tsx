@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { clearAuth } from '../../store/authSlice';
 import { clearAuthStorage } from '../../lib/authStorage';
+import { useState } from 'react';
 
 type Variant =
   | 'before-login'
@@ -27,23 +28,30 @@ export default function Header({
 }) {
   const router = useRouter();
   const dispatch = useDispatch();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const base = 'bg-black sticky top-0 z-50';
-  const desktop = 'h-[80px] px-6';
+  const desktop = 'h-[64px] px-6';
   const mobile = 'h-[64px]';
+
+  const handleToggleMenu = () => {
+    setIsMenuOpen((prev) => !prev);
+    onToggleMenuAction?.();
+  };
 
   if (variant === 'open-auth-mobile') {
     return (
       <header
         className={`${base} w-full h-[120px] flex flex-col items-start p-0`}
       >
-        <div className='w-full flex flex-row justify-between items-center px-[16px]'>
+        <div className='w-full flex flex-row justify-between items-center px-xl mt-md'>
           <Brand />
           <div className='flex items-center gap-md'>
             <IconButton>
               <Icon icon='lucide:search' />
             </IconButton>
-            <IconButton onClick={onToggleMenuAction}>
-              <Icon icon='lucide:menu' />
+            <IconButton onClick={handleToggleMenu}>
+              <Icon icon={isMenuOpen ? 'lucide:x' : 'lucide:menu'} />
             </IconButton>
           </div>
         </div>
@@ -112,8 +120,8 @@ export default function Header({
           <IconButton>
             <Icon icon='lucide:search' />
           </IconButton>
-          <IconButton onClick={onToggleMenuAction}>
-            <Icon icon='lucide:menu' />
+          <IconButton onClick={handleToggleMenu}>
+            <Icon icon={isMenuOpen ? 'lucide:x' : 'lucide:menu'} />
           </IconButton>
         </div>
       </header>
