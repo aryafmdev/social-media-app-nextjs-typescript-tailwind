@@ -12,10 +12,10 @@ export default function AlertBanner({ label, variant, onClose }: Props) {
         <span className="font-semibold text-sm tracking-[-0.02em] text-white flex-1">{label}</span>
         <button
           aria-label="close"
-          className="w-4 h-4 text-white"
+          className="text-white"
           onClick={onClose}
         >
-          ×
+          ✖
         </button>
       </div>
     </div>
