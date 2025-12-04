@@ -1,3 +1,4 @@
+import Image from 'next/image';
 type Props = {
   src?: string;
   alt?: string;
@@ -6,15 +7,16 @@ type Props = {
 
 export default function Avatar({ src, alt = 'avatar', size = 32 }: Props) {
   const style = { width: size, height: size } as const;
+  const actualSrc = src ?? '/assets/images/avatar.png';
   return (
     <div className='rounded-full overflow-hidden bg-neutral-700' style={style}>
-      {src ? (
-        <img src={src} alt={alt} className='w-full h-full object-cover' />
-      ) : (
-        <div className='w-full h-full flex items-center justify-center text-neutral-200'>
-          JD
-        </div>
-      )}
+      <Image
+        src={actualSrc}
+        alt={alt}
+        width={size}
+        height={size}
+        className='w-full h-full object-cover'
+      />
     </div>
   );
 }
