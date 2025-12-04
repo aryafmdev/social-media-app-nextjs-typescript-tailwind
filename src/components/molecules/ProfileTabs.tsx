@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 
-export type ProfileTab = "gallery" | "saved";
+export type ProfileTab = "gallery" | "liked" | "saved";
 
 export default function ProfileTabs({ active, onChange }: { active: ProfileTab; onChange: (t: ProfileTab) => void }) {
   return (
@@ -10,14 +10,17 @@ export default function ProfileTabs({ active, onChange }: { active: ProfileTab; 
           <Icon icon="lucide:layout-grid" />
           <span>Gallery</span>
         </button>
+        <button onClick={() => onChange("liked")} className={`flex items-center gap-sm ${active === "liked" ? "font-semibold" : "text-neutral-400"}`}>
+          <Icon icon="lucide:heart" />
+          <span>Liked</span>
+        </button>
         <button onClick={() => onChange("saved")} className={`flex items-center gap-sm ${active === "saved" ? "font-semibold" : "text-neutral-400"}`}>
           <Icon icon="lucide:bookmark" />
           <span>Saved</span>
         </button>
       </div>
       <div className="mt-sm h-px bg-neutral-800" />
-      <div className={`h-1 bg-neutral-25 w-24 ${active === "saved" ? "ml-32" : "ml-0"}`} />
+      <div className={`h-1 bg-neutral-25 w-24 ${active === "liked" ? "ml-32" : active === "saved" ? "ml-[16rem]" : "ml-0"}`} />
     </div>
   );
 }
-
