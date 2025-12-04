@@ -104,13 +104,13 @@ export default function Header({
         <div className='flex items-center gap-xl'>
           <a
             href='/login'
-            className='rounded-full border border-neutral-700 text-neutral-25 px-3xl py-sm'
+            className='rounded-full lg:w-[130px] text-center border border-neutral-700 text-neutral-25 px-3xl py-md'
           >
             Login
           </a>
           <a
             href='/register'
-            className='rounded-full bg-primary-200 text-neutral-25 px-3xl py-sm'
+            className='rounded-full lg:w-[130px] text-center bg-primary-200 text-neutral-25 px-3xl py-md'
           >
             Register
           </a>

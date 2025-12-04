@@ -13,7 +13,7 @@ export default function SearchBar({ placeholder = 'Search', onCloseAction }: Sea
   return (
     <div className="flex items-center w-full h-6xl px-lg gap-md">
       {/* Search bar utama */}
-      <div className="flex items-center flex-1 h-full bg-neutral-900 rounded-full px-lg py-sm md:w-[clamp(363px,34.09vw,491px)]">
+      <div className="flex items-center flex-1 h-full bg-neutral-900 rounded-full px-lg py-sm md:w-[clamp(363px,34vw,1309px)]">
         <Icon icon="lucide:search" className="text-neutral-400 size-5 mr-sm" />
         <input
           type="text"
