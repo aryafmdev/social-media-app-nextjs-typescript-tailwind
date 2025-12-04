@@ -29,14 +29,23 @@ export default function Header({
   const router = useRouter();
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [variantState, setVariantState] = useState<Variant>(variant);
 
-  const base = 'bg-black sticky top-0 z-50';
+  const base = 'bg-black sticky top-0 z-50 border-b border-neutral-900';
   const desktop = 'h-[64px] px-6';
   const mobile = 'h-[64px]';
 
   const handleToggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
     onToggleMenuAction?.();
+  };
+
+  const handleSearchToggle = () => {
+    setVariantState('search');
+  };
+
+  const handleSearchClose = () => {
+    setVariantState(variant);
   };
 
   if (variant === 'open-auth-mobile') {
@@ -46,7 +55,7 @@ export default function Header({
       >
         <div className='w-full flex flex-row justify-between items-center px-xl mt-md'>
           <Brand />
-          <div className='flex items-center gap-md'>
+          <div className='flex items-center gap-md text-3xl'>
             <IconButton>
               <Icon icon='lucide:search' />
             </IconButton>
@@ -73,10 +82,10 @@ export default function Header({
     );
   }
 
-  if (variant === 'search') {
+  if (variantState === 'search') {
     return (
       <header className={`${base} ${mobile} flex flex-row items-center px-xl`}>
-        <SearchBar />
+        <SearchBar onCloseAction={handleSearchClose} />
       </header>
     );
   }
@@ -89,7 +98,7 @@ export default function Header({
         <Brand />
         <div className='flex-1 flex justify-center'>
           <div className=''>
-            <SearchBar />
+            <SearchBar onCloseAction={handleSearchClose} />
           </div>
         </div>
         <div className='flex items-center gap-xl'>
@@ -110,14 +119,14 @@ export default function Header({
     );
   }
 
-  if (variant === 'before-login-mobile') {
+  if (variantState === 'before-login-mobile') {
     return (
       <header
         className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
       >
         <Brand />
-        <div className='flex items-center gap-md'>
-          <IconButton>
+        <div className='flex items-center gap-md text-3xl'>
+          <IconButton onClick={handleSearchToggle}>
             <Icon icon='lucide:search' />
           </IconButton>
           <IconButton onClick={handleToggleMenu}>
@@ -167,7 +176,7 @@ export default function Header({
       >
         <Brand />
         <div className='flex items-center gap-md'>
-          <IconButton>
+          <IconButton onClick={handleSearchToggle}>
             <Icon icon='lucide:search' />
           </IconButton>
           <Avatar />
@@ -195,7 +204,7 @@ export default function Header({
         <div className='flex items-center gap-md'>
           <span className='text-neutral-25'>John Doe</span>
           <Avatar />
-          <IconButton
+          <IconButton 
             onClick={() => {
               clearAuthStorage();
               dispatch(clearAuth());
