@@ -40,13 +40,19 @@ export default function Header({
             </IconButton>
           </div>
         </div>
-        <div className='w-full px-[16px] mt-md flex items-center gap-md'>
-          <button className='rounded-full border border-neutral-700 text-neutral-25 px-3xl py-sm'>
+        <div className='w-full px-xl mt-md flex gap-xl items-center'>
+          <a
+            href='/login'
+            className='flex-1 rounded-full border border-neutral-700 text-neutral-25 px-3xl py-sm text-center'
+          >
             Login
-          </button>
-          <button className='rounded-full bg-primary-200 text-neutral-25 px-3xl py-sm'>
+          </a>
+          <a
+            href='/register'
+            className='flex-1 rounded-full bg-primary-200 text-neutral-25 px-3xl py-sm text-center'
+          >
             Register
-          </button>
+          </a>
         </div>
       </header>
     );
@@ -72,12 +78,18 @@ export default function Header({
           </div>
         </div>
         <div className='flex items-center gap-xl'>
-          <button className='rounded-full border border-neutral-700 text-neutral-25 px-3xl py-sm'>
+          <a
+            href='/login'
+            className='rounded-full border border-neutral-700 text-neutral-25 px-3xl py-sm'
+          >
             Login
-          </button>
-          <button className='rounded-full bg-primary-200 text-neutral-25 px-3xl py-sm'>
+          </a>
+          <a
+            href='/register'
+            className='rounded-full bg-primary-200 text-neutral-25 px-3xl py-sm'
+          >
             Register
-          </button>
+          </a>
         </div>
       </header>
     );
