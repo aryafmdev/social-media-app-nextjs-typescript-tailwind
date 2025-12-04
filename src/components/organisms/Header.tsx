@@ -20,7 +20,7 @@ export default function Header({
   variant?: Variant;
   onToggleMenu?: () => void;
 }) {
-  const base = 'bg-black border-b border-neutral-900';
+  const base = 'bg-black sticky top-0 z-50';
   const desktop = 'h-[80px] px-6';
   const mobile = 'h-[64px]';
 
@@ -86,7 +86,7 @@ export default function Header({
   if (variant === 'before-login-mobile') {
     return (
       <header
-        className={`${base} ${mobile} flex flex-row justify-between items-center`}
+        className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
       >
         <Brand />
         <div className='flex items-center gap-md'>

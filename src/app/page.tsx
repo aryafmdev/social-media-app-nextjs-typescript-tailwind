@@ -6,7 +6,7 @@ import PostCard from "../components/organisms/PostCard";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-neutral-950">
+    <main className="min-h-screen bg-black">
       <HeaderSmart />
       <section className="mx-auto px-7xl py-7xl flex flex-col gap-4xl">
         <PostCard variant="mobile" />

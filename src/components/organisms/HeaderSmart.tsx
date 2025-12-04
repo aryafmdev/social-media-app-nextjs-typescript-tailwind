@@ -12,7 +12,7 @@ export default function HeaderSmart() {
   const [isMdUp, setIsMdUp] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 0px)");
+    const mq = window.matchMedia("(min-width: 768px)");
     const update = () => setIsMdUp(mq.matches);
     update();
     mq.addEventListener("change", update);
