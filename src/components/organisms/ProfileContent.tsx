@@ -14,7 +14,7 @@ export default function ProfileContent({
 }) {
   if (!hasPosts) {
     return (
-      <div className='mt-4xl text-center'>
+      <div className='mt-2xl text-center'>
         <h2 className='font-display text-md font-bold text-neutral-25'>
           Your story starts here
         </h2>
