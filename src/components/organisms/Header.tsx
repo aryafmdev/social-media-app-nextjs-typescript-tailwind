@@ -14,78 +14,87 @@ type Variant =
   | 'before-login'
   | 'before-login-mobile'
   | 'open-auth-mobile'
-  | 'search'
+  | 'search-mobile'
   | 'after-login'
   | 'after-login-mobile'
   | 'mobile-profile';
 
 export default function Header({
   variant,
-  onToggleMenuAction,
+  onToggleSearchAction,
+  onToggleAuthAction,
 }: {
   variant?: Variant;
-  onToggleMenuAction?: () => void;
+  onToggleSearchAction?: () => void;
+  onToggleAuthAction?: () => void;
 }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // const [variantState, setVariantState] = useState<Variant>(variant);
 
-  const base = 'bg-black sticky top-0 z-50 border-b border-neutral-900';
+  const base = 'bg-black sticky top-0 z-50 border-b border-neutral-900 md:px-2xl lg:px-8xl';
   const desktop = 'h-[64px] px-6';
   const mobile = 'h-[64px]';
 
   const handleToggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
-    onToggleMenuAction?.();
+    onToggleAuthAction?.();
   };
 
-  // const handleSearchToggle = () => {
-  //   setVariantState('search');
-  // };
-
-  // const handleSearchClose = () => {
-  //   setVariantState(variant);
-  // };
-
-  if (variant === 'open-auth-mobile') {
+    if (variant === 'before-login-mobile') {
     return (
       <header
-        className={`${base} w-full h-[120px] flex flex-col items-start p-0`}
+        className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
       >
-        <div className='w-full flex flex-row justify-between items-center px-xl mt-md'>
-          <Brand />
-          <div className='flex items-center gap-md text-3xl'>
-            <IconButton>
-              <Icon icon='lucide:search' />
-            </IconButton>
-            <IconButton onClick={handleToggleMenu}>
-              <Icon icon={isMenuOpen ? 'lucide:x' : 'lucide:menu'} />
-            </IconButton>
-          </div>
-        </div>
-        <div className='w-full px-xl mt-md flex gap-xl items-center'>
-          <a
-            href='/login'
-            className='flex-1 rounded-full border border-neutral-700 text-neutral-25 px-3xl py-sm text-center'
-          >
-            Login
-          </a>
-          <a
-            href='/register'
-            className='flex-1 rounded-full bg-primary-200 text-neutral-25 px-3xl py-sm text-center'
-          >
-            Register
-          </a>
+        <Brand />
+        <div className='flex items-center gap-md text-3xl'>
+          <IconButton onClick={onToggleSearchAction} >
+            <Icon icon='lucide:search' />
+          </IconButton>
+          <IconButton onClick={handleToggleMenu} >
+            <Icon icon={isMenuOpen ? 'lucide:menu' : 'lucide:menu'} />
+          </IconButton>
         </div>
       </header>
     );
   }
 
-  if (variant === 'search') {
+  if (variant === 'open-auth-mobile') {
+    return (
+      <header className={`${base} ${mobile} flex flex-row justify-between items-center px-xl relative`}>
+  <Brand />
+  <div className='flex items-center gap-md text-3xl'>
+    <IconButton onClick={onToggleSearchAction}>
+      <Icon icon='lucide:search' />
+    </IconButton>
+    <IconButton onClick={onToggleAuthAction}>
+      <Icon icon='lucide:x' />
+    </IconButton>
+  </div>
+
+  {/* Auth menu dropdown */}
+  <div className='absolute top-full left-0 w-full bg-black px-xl py-xl flex gap-xl items-center border-b border-neutral-900'>
+    <a
+      href='/login'
+      className='flex-1 rounded-full border border-neutral-700 text-neutral-25 px-3xl py-sm text-center'
+    >
+      Login
+    </a>
+    <a
+      href='/register'
+      className='flex-1 rounded-full bg-primary-200 text-neutral-25 px-3xl py-sm text-center'
+    >
+      Register
+    </a>
+  </div>
+</header>
+    );
+  }
+
+  if (variant === 'search-mobile') {
     return (
       <header className={`${base} ${mobile} flex flex-row items-center px-xl`}>
-        <SearchBar onCloseAction={onToggleMenuAction} />
+        <SearchBar onCloseAction={onToggleSearchAction} />
       </header>
     );
   }
@@ -98,7 +107,7 @@ export default function Header({
         <Brand />
         <div className='flex-1 flex justify-center'>
           <div className=''>
-            <SearchBar onCloseAction={onToggleMenuAction} />
+            <SearchBar/>
           </div>
         </div>
         <div className='flex items-center gap-xl'>
@@ -114,24 +123,6 @@ export default function Header({
           >
             Register
           </a>
-        </div>
-      </header>
-    );
-  }
-
-  if (variant === 'before-login-mobile') {
-    return (
-      <header
-        className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
-      >
-        <Brand />
-        <div className='flex items-center gap-md text-3xl'>
-          <IconButton>
-            <Icon icon='lucide:search' />
-          </IconButton>
-          <IconButton onClick={handleToggleMenu}>
-            <Icon icon={isMenuOpen ? 'lucide:x' : 'lucide:menu'} />
-          </IconButton>
         </div>
       </header>
     );
@@ -176,7 +167,7 @@ export default function Header({
       >
         <Brand />
         <div className='flex items-center gap-md text-3xl'>
-          <IconButton onClick={onToggleMenuAction}>
+          <IconButton onClick={onToggleSearchAction}>
             <Icon icon='lucide:search' />
           </IconButton>
           <Avatar />
