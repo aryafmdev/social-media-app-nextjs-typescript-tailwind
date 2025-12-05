@@ -5,7 +5,7 @@ type Props = {
   size?: number;
 };
 
-export default function Avatar({ src, alt = 'avatar', size = 32 }: Props) {
+export default function Avatar({ src, alt = 'avatar', size = 40 }: Props) {
   const style = { width: size, height: size } as const;
   const actualSrc = src ?? '/assets/images/avatar.png';
   return (

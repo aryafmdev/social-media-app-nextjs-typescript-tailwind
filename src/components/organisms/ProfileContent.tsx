@@ -14,18 +14,18 @@ export default function ProfileContent({
 }) {
   if (!hasPosts) {
     return (
-      <div className='mt-3xl text-center'>
-        <h2 className='font-display text-xl text-neutral-25'>
+      <div className='mt-4xl text-center'>
+        <h2 className='font-display text-md font-bold text-neutral-25'>
           Your story starts here
         </h2>
-        <p className='text-neutral-300 mt-md'>
+        <p className='text-neutral-300 text-sm font-regular mt-md'>
           Share your first post and let the world see your moments, passions,
           and memories. Make this space truly yours.
         </p>
         <div className='mt-2xl flex justify-center'>
           <button
             onClick={onUpload}
-            className='rounded-full bg-primary-200 text-neutral-25 px-5xl py-sm'
+            className='rounded-full bg-primary-300 text-md font-bold text-neutral-25 px-5xl py-md'
           >
             Upload My First Post
           </button>

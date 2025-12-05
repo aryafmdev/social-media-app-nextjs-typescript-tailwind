@@ -191,9 +191,13 @@ export default function Header({
       <header
         className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
       >
-        <button className='text-neutral-25'>←</button>
         <div className='flex items-center gap-md'>
-          <span className='text-neutral-25'>John Doe</span>
+        <IconButton className='text-2xl'>
+            <Icon icon='lucide:arrow-left' />
+          </IconButton>
+          <span className='text-neutral-25 font-bold text-md'>John Doe</span>
+        </div>
+        <div className='flex items-center gap-md'>
           <Avatar />
           <IconButton
             onClick={() => {
