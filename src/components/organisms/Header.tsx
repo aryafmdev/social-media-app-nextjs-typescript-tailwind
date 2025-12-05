@@ -148,12 +148,12 @@ export default function Header({
             <SearchBar />
           </div>
         </div>
-        <div className='flex items-center gap-md'>
+        <div className='flex items-center gap-md text-3xl'>
           <IconButton>
-            <Icon icon='lucide:search' />
+            <Icon icon='lucide:search' className='md:hidden' />
           </IconButton>
           <Avatar />
-          <span className='text-neutral-25 font-medium'>John Doe</span>
+          <span className='text-neutral-25 font-medium text-md'>John Doe</span>
           <IconButton
             onClick={() => {
               clearAuthStorage();
@@ -175,7 +175,7 @@ export default function Header({
         className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
       >
         <Brand />
-        <div className='flex items-center gap-md'>
+        <div className='flex items-center gap-md text-3xl'>
           <IconButton onClick={handleSearchToggle}>
             <Icon icon='lucide:search' />
           </IconButton>
