@@ -86,12 +86,12 @@ export default function ProfileEditForm({
 
   return (
     <form
-      className='mt-2xl rounded-2xl bg-neutral-900 border border-neutral-800 p-3xl flex flex-col gap-xl'
+      className='mt-2xl rounded-lg flex flex-col gap-xl'
       onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
     >
       <div className='flex flex-col items-center gap-xl'>
-        <Avatar size={96} src={prefill?.avatarUrl ?? me.avatarUrl} />
-        <label className='rounded-full border border-neutral-700 text-neutral-25 px-4xl py-sm cursor-pointer'>
+        <Avatar size={80} src={prefill?.avatarUrl ?? me.avatarUrl} />
+        <label className='rounded-full w-[160px] h-[40px] border border-neutral-700 text-sm md:text-md font-bold text-neutral-25 flex items-center justify-center cursor-pointer'>
           Change Photo
           <input
             type='file'
@@ -116,8 +116,8 @@ export default function ProfileEditForm({
         registerFnAction={form.register}
       />
       <div className='flex flex-col gap-xs'>
-        <label className='text-sm text-neutral-200'>Email</label>
-        <Input value={me.email ?? ''} disabled />
+        <label className='text-sm font-bold text-neutral-50'>Email</label>
+        <Input value={me.email ?? ''} readOnly placeholder='email@example.com' />
       </div>
       <TextField<FormValues>
         label='Number Phone'
@@ -127,15 +127,16 @@ export default function ProfileEditForm({
         registerFnAction={form.register}
       />
       <div className='flex flex-col gap-xs'>
-        <label className='text-sm text-neutral-200'>Bio</label>
+        <label className='text-sm font-bold text-neutral-50'>Bio</label>
         <textarea
           {...form.register('bio')}
-          className={`w-full rounded-md bg-neutral-900 text-neutral-25 placeholder:text-neutral-500 px-md py-sm border ${form.formState.errors.bio ? 'border-red-500' : 'border-neutral-700'} focus:outline-none focus:ring-2 focus:ring-primary-200`}
+          className={`w-full rounded-md bg-neutral-950 text-neutral-25 placeholder:text-neutral-500 px-md py-sm border ${form.formState.errors.bio ? 'border-red-500' : 'border-neutral-700'} focus:outline-none focus:ring-2 focus:ring-primary-200`}
           rows={4}
           placeholder='Your bio'
         />
       </div>
-      <Button type='submit'>Save</Button>
+      <Button type='submit'
+      className='w-full rounded-full bg-primary-300 text-neutral-25 font-bold text-sm'>Save Changes</Button>
     </form>
   );
 }

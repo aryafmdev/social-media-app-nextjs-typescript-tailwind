@@ -1,6 +1,6 @@
 'use client';
 import ProfileTemplate from '../../../components/templates/ProfileTemplate';
-import EditProfileHeader from '../../../components/organisms/EditProfileHeader';
+import Header from '../../../components/organisms/Header';
 import ProfileEditForm from '../../../components/molecules/ProfileEditForm';
 import { useQuery } from '@tanstack/react-query';
 import { getMe } from '../../../lib/api/me';
@@ -41,8 +41,8 @@ export default function EditProfilePage() {
   }, [me.data, saved?.user]);
   return (
     <main className='min-h-screen bg-neutral-950'>
+      <Header variant='mobile-edit-profile' />
       <ProfileTemplate>
-        <EditProfileHeader name='Edit Profile' avatarUrl={prefill?.avatarUrl} />
         <ProfileEditForm
           me={{
             name: '',

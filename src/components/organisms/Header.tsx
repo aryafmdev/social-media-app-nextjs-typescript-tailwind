@@ -17,7 +17,9 @@ type Variant =
   | 'search-mobile'
   | 'after-login'
   | 'after-login-mobile'
-  | 'mobile-profile';
+  | 'mobile-profile'
+  | 'mobile-edit-profile';
+  
 
 export default function Header({
   variant,
@@ -32,7 +34,8 @@ export default function Header({
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const base = 'bg-black sticky top-0 z-50 border-b border-neutral-900 md:px-2xl lg:px-8xl';
+  const base =
+    'bg-black sticky top-0 z-50 border-b border-neutral-900 md:px-2xl lg:px-8xl';
   const desktop = 'h-[64px] px-6';
   const mobile = 'h-[64px]';
 
@@ -41,17 +44,17 @@ export default function Header({
     onToggleAuthAction?.();
   };
 
-    if (variant === 'before-login-mobile') {
+  if (variant === 'before-login-mobile') {
     return (
       <header
         className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
       >
         <Brand />
         <div className='flex items-center gap-md text-3xl'>
-          <IconButton onClick={onToggleSearchAction} >
+          <IconButton onClick={onToggleSearchAction}>
             <Icon icon='lucide:search' />
           </IconButton>
-          <IconButton onClick={handleToggleMenu} >
+          <IconButton onClick={handleToggleMenu}>
             <Icon icon={isMenuOpen ? 'lucide:menu' : 'lucide:menu'} />
           </IconButton>
         </div>
@@ -61,33 +64,35 @@ export default function Header({
 
   if (variant === 'open-auth-mobile') {
     return (
-      <header className={`${base} ${mobile} flex flex-row justify-between items-center px-xl relative`}>
-  <Brand />
-  <div className='flex items-center gap-md text-3xl'>
-    <IconButton onClick={onToggleSearchAction}>
-      <Icon icon='lucide:search' />
-    </IconButton>
-    <IconButton onClick={onToggleAuthAction}>
-      <Icon icon='lucide:x' />
-    </IconButton>
-  </div>
+      <header
+        className={`${base} ${mobile} flex flex-row justify-between items-center px-xl relative`}
+      >
+        <Brand />
+        <div className='flex items-center gap-md text-3xl'>
+          <IconButton onClick={onToggleSearchAction}>
+            <Icon icon='lucide:search' />
+          </IconButton>
+          <IconButton onClick={onToggleAuthAction}>
+            <Icon icon='lucide:x' />
+          </IconButton>
+        </div>
 
-  {/* Auth menu dropdown */}
-  <div className='absolute top-full left-0 w-full bg-black px-xl py-xl flex gap-xl items-center border-b border-neutral-900'>
-    <a
-      href='/login'
-      className='flex-1 rounded-full border border-neutral-700 text-neutral-25 px-3xl py-sm text-center'
-    >
-      Login
-    </a>
-    <a
-      href='/register'
-      className='flex-1 rounded-full bg-primary-200 text-neutral-25 px-3xl py-sm text-center'
-    >
-      Register
-    </a>
-  </div>
-</header>
+        {/* Auth menu dropdown */}
+        <div className='absolute top-full left-0 w-full bg-black px-xl py-xl flex gap-xl items-center border-b border-neutral-900'>
+          <a
+            href='/login'
+            className='flex-1 rounded-full border border-neutral-700 text-neutral-25 px-3xl py-sm text-center'
+          >
+            Login
+          </a>
+          <a
+            href='/register'
+            className='flex-1 rounded-full bg-primary-200 text-neutral-25 px-3xl py-sm text-center'
+          >
+            Register
+          </a>
+        </div>
+      </header>
     );
   }
 
@@ -107,7 +112,7 @@ export default function Header({
         <Brand />
         <div className='flex-1 flex justify-center'>
           <div className=''>
-            <SearchBar/>
+            <SearchBar />
           </div>
         </div>
         <div className='flex items-center gap-xl'>
@@ -192,10 +197,44 @@ export default function Header({
         className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
       >
         <div className='flex items-center gap-md'>
-        <IconButton className='text-2xl'>
+          <IconButton
+            className='text-2xl cursor-pointer'
+            onClick={() => router.push('/')}
+          >
             <Icon icon='lucide:arrow-left' />
           </IconButton>
           <span className='text-neutral-25 font-bold text-md'>John Doe</span>
+        </div>
+        <div className='flex items-center gap-md'>
+          <Avatar />
+          <IconButton
+            onClick={() => {
+              clearAuthStorage();
+              dispatch(clearAuth());
+              router.push('/login');
+            }}
+            aria-label='Logout'
+          >
+            <Icon icon='lucide:log-out' />
+          </IconButton>
+        </div>
+      </header>
+    );
+  }
+
+  if (variant === 'mobile-edit-profile') {
+    return (
+      <header
+        className={`${base} ${mobile} flex flex-row justify-between items-center px-xl`}
+      >
+        <div className='flex items-center gap-md'>
+          <IconButton
+            className='text-2xl cursor-pointer'
+            onClick={() => router.push('/profile')}
+          >
+            <Icon icon='lucide:arrow-left' />
+          </IconButton>
+          <span className='text-neutral-25 font-bold text-md'>Edit Profile</span>
         </div>
         <div className='flex items-center gap-md'>
           <Avatar />

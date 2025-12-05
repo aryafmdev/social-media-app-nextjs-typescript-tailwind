@@ -29,11 +29,11 @@ export default function ProfileHeader({
       <div className='mt-2xl flex items-center gap-xl'>
         <button
           onClick={onEdit}
-          className='rounded-full w-full border border-neutral-800 text-sm font-bold text-neutral-25 px-4xl py-md'
+          className='rounded-full w-full border border-neutral-800 text-sm font-bold text-neutral-25 px-4xl py-md cursor-pointer hover:bg-neutral-800'
         >
           Edit Profile
         </button>
-        <button className='w-12 h-10 text-xl rounded-full border border-neutral-800 text-neutral-25 flex items-center justify-center'>
+        <button className='w-12 h-10 text-xl rounded-full border border-neutral-800 text-neutral-25 flex items-center justify-center cursor-pointer'>
           <Icon icon='lucide:send' />
         </button>
       </div>

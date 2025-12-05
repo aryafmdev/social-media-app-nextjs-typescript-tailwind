@@ -14,7 +14,6 @@ import { RootState } from '../../store';
 import { useQuery } from '@tanstack/react-query';
 import { getMe, getMyPosts } from '../../lib/api/me';
 import { getMySaved } from '../../lib/api/saves';
-import { getMyLiked } from '../../lib/api/likes';
 import { loadAuth } from '../../lib/authStorage';
 import AlertBanner from '../../components/organisms/AlertBanner';
 
@@ -55,11 +54,6 @@ export default function ProfilePage() {
     queryFn: () => getMySaved(token as string, 1, 20),
     enabled: !!token,
   });
-  const liked = useQuery({
-    queryKey: ['me', 'likes', 1, 20],
-    queryFn: () => getMyLiked(token as string, 1, 20),
-    enabled: !!token,
-  });
   const hasPosts = (hasPostsOverride ??
     (me.data?.stats?.post ?? 0) > 0) as boolean;
 
@@ -84,13 +78,7 @@ export default function ProfilePage() {
           tab={tab}
           hasPosts={hasPosts}
           onUpload={() => setHasPostsOverride(true)}
-          items={
-            tab === 'liked'
-              ? liked.data?.items
-              : tab === 'saved'
-                ? saved.data?.items
-                : posts.data?.items
-          }
+          items={tab === 'saved' ? saved.data?.items : posts.data?.items}
         />
       </ProfileTemplate>
       <div className='fixed inset-x-0 bottom-10 flex justify-center'>

@@ -27,7 +27,7 @@ export default function TextField<T extends FieldValues>({
 }: Props<T>) {
   return (
     <div className='flex flex-col gap-xs'>
-      <label className='text-sm text-neutral-200'>{label}</label>
+      <label className='text-sm font-bold text-neutral-50'>{label}</label>
       <Input
         {...(registerFnAction ? registerFnAction(name) : {})}
         type={type}
