@@ -29,21 +29,23 @@ export default function EditProfilePage() {
     enabled: !!effectiveToken,
   });
   const prefill = useMemo(() => {
+    if (me.data)
+      return { ...me.data } as Partial<import('../../../lib/api/me').Me>;
     if (reduxUser)
       return {
         name: reduxUser.name,
         username: reduxUser.username,
         email: reduxUser.email,
         phone: reduxUser.phone,
+        bio: '',
       } as Partial<import('../../../lib/api/me').Me>;
-    if (me.data)
-      return { ...me.data } as Partial<import('../../../lib/api/me').Me>;
     if (saved?.user)
       return {
         name: saved.user.name,
         username: saved.user.username,
         email: saved.user.email,
         phone: saved.user.phone,
+        bio: saved.user.bio,
       } as Partial<import('../../../lib/api/me').Me>;
     return undefined;
   }, [reduxUser, me.data, saved?.user]);

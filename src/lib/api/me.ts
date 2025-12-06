@@ -135,7 +135,7 @@ export async function getMe(token: string): Promise<Me> {
         username: u?.username ?? '',
         email: u?.email,
         phone: u?.phone,
-        bio: '',
+        bio: u?.bio,
         avatarUrl: undefined,
         stats: undefined,
       };

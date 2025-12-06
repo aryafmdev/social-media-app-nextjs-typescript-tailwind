@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '../../components/organisms/Header';
 import ProfileTemplate from '../../components/templates/ProfileTemplate';
 import ProfileHeader from '../../components/organisms/ProfileHeader';
@@ -81,11 +81,9 @@ export default function ProfilePage() {
           stats={me.data?.stats}
           onEdit={() => router.push('/profile/edit')}
         />
-        {typeof window !== 'undefined' &&
-          new URLSearchParams(window.location.search).get('updated') ===
-            '1' && (
-            <AlertBanner variant='success' label='Profile Success Update' />
-          )}
+        {useSearchParams().get('updated') === '1' && (
+          <AlertBanner variant='success' label='Profile Success Update' />
+        )}
         <ProfileTabs active={tab} onChange={setTab} />
         <ProfileContent
           tab={tab}

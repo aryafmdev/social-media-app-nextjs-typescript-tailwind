@@ -5,6 +5,7 @@ type User = {
   username?: string;
   email: string;
   phone?: string;
+  bio?: string;
 };
 
 type AuthState = {
@@ -31,4 +32,3 @@ const authSlice = createSlice({
 
 export const { setAuth, clearAuth } = authSlice.actions;
 export default authSlice.reducer;
-

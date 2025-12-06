@@ -118,6 +118,10 @@ export default function ProfileEditForm({
           form.getValues().username ??
           saved?.user?.username,
         phone: updated?.phone ?? form.getValues().phone ?? saved?.user?.phone,
+        bio:
+          updated?.bio ??
+          form.getValues().bio ??
+          saved?.user?.bio,
       };
       dispatch(setAuth({ token, user: mergedUser }));
       saveAuth(token, mergedUser);

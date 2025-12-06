@@ -46,12 +46,14 @@ export default function LoginPage() {
       let name: string | undefined;
       let username: string | undefined;
       let phone: string | undefined;
+      let bio: string | undefined;
       try {
         if (token) {
           const me = await getMe(token);
           name = me?.name;
           username = me?.username;
           phone = me?.phone;
+          bio = me?.bio;
         }
       } catch {}
       const email = form.getValues().email;
@@ -61,6 +63,7 @@ export default function LoginPage() {
         name: (name && name.trim()) || saved?.user?.name,
         username: (username && username.trim()) || saved?.user?.username,
         phone: (phone && phone.trim()) || saved?.user?.phone,
+        bio: (bio && bio.trim()) || saved?.user?.bio,
       };
       dispatch(setAuth({ token, user: mergedUser }));
       saveAuth(token, mergedUser);

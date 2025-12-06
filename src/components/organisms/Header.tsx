@@ -45,14 +45,15 @@ export default function Header({
     queryFn: () => getMe(effectiveToken as string),
     enabled: !!effectiveToken,
   });
-  const displayName = [
-    user?.name,
-    user?.username,
-    me.data?.name,
-    me.data?.username,
-    savedAuth?.user?.name,
-    savedAuth?.user?.username,
-  ].find((v) => typeof v === 'string' && v.trim().length > 0) ?? '';
+  const displayName =
+    [
+      user?.name,
+      user?.username,
+      me.data?.name,
+      me.data?.username,
+      savedAuth?.user?.name,
+      savedAuth?.user?.username,
+    ].find((v) => typeof v === 'string' && v.trim().length > 0) ?? '';
   const avatarSrc = me.data?.avatarUrl;
 
   const base =
@@ -170,7 +171,10 @@ export default function Header({
             <Icon icon='lucide:search' className='md:hidden cursor-pointer' />
           </IconButton>
           <Avatar src={avatarSrc} />
-          <span className='text-neutral-25 font-medium text-md'>
+          <span
+            className='text-neutral-25 font-medium text-md'
+            suppressHydrationWarning
+          >
             {displayName || 'User'}
           </span>
           <IconButton
@@ -226,7 +230,10 @@ export default function Header({
           >
             <Icon icon='lucide:arrow-left' />
           </IconButton>
-          <span className='text-neutral-25 font-bold text-md'>
+          <span
+            className='text-neutral-25 font-bold text-md'
+            suppressHydrationWarning
+          >
             {displayName || '-'}
           </span>
         </div>
