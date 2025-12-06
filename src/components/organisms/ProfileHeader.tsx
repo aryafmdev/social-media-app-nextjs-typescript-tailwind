@@ -10,8 +10,8 @@ type Props = {
 };
 
 export default function ProfileHeader({
-  name = 'John Doe',
-  username = 'johndoe',
+  name = '',
+  username = '',
   avatarUrl,
   stats,
   onEdit,

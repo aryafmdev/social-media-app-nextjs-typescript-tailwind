@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Header from '../../components/organisms/Header';
@@ -19,6 +19,7 @@ import AlertBanner from '../../components/organisms/AlertBanner';
 
 export default function ProfilePage() {
   const token = useSelector((s: RootState) => s.auth.token);
+  const reduxUser = useSelector((s: RootState) => s.auth.user);
   const router = useRouter();
   const [tab, setTab] = useState<ProfileTab>('gallery');
   const [hasPostsOverride, setHasPostsOverride] = useState<boolean | null>(
@@ -39,20 +40,26 @@ export default function ProfilePage() {
     return () => mq.removeEventListener('change', update);
   }, []);
 
+  const savedAuth = typeof window !== 'undefined' ? loadAuth() : undefined;
+  const effectiveToken = useMemo(
+    () => token ?? savedAuth?.token ?? null,
+    [token, savedAuth?.token]
+  );
+
   const me = useQuery({
     queryKey: ['me'],
-    queryFn: () => getMe(token as string),
-    enabled: !!token,
+    queryFn: () => getMe(effectiveToken as string),
+    enabled: !!effectiveToken,
   });
   const posts = useQuery({
     queryKey: ['me', 'posts', 1, 20],
-    queryFn: () => getMyPosts(token as string, 1, 20),
-    enabled: !!token,
+    queryFn: () => getMyPosts(effectiveToken as string, 1, 20),
+    enabled: !!effectiveToken,
   });
   const saved = useQuery({
     queryKey: ['me', 'saved', 1, 20],
-    queryFn: () => getMySaved(token as string, 1, 20),
-    enabled: !!token,
+    queryFn: () => getMySaved(effectiveToken as string, 1, 20),
+    enabled: !!effectiveToken,
   });
   const hasPosts = (hasPostsOverride ??
     (me.data?.stats?.post ?? 0) > 0) as boolean;
@@ -62,8 +69,14 @@ export default function ProfilePage() {
       <Header variant={isMdUp ? 'after-login' : 'mobile-profile'} />
       <ProfileTemplate>
         <ProfileHeader
-          name={me.data?.name}
-          username={me.data?.username}
+          name={[reduxUser?.name, me.data?.name, savedAuth?.user?.name].find(
+            (v) => typeof v === 'string' && v.trim().length > 0
+          )}
+          username={[
+            reduxUser?.username,
+            me.data?.username,
+            savedAuth?.user?.username,
+          ].find((v) => typeof v === 'string' && v.trim().length > 0)}
           avatarUrl={me.data?.avatarUrl}
           stats={me.data?.stats}
           onEdit={() => router.push('/profile/edit')}

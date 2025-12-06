@@ -13,6 +13,8 @@ import TextField from '../../../components/molecules/TextField';
 import PasswordField from '../../../components/molecules/PasswordField';
 import Button from '../../../components/atoms/Button';
 import AlertBanner from '../../../components/organisms/AlertBanner';
+import { useMemo, useState } from 'react';
+import { registerUser } from '../../../lib/api/auth';
 
 const RegisterSchema = z
   .object({
@@ -37,6 +39,7 @@ export default function RegisterPage() {
   });
   const router = useRouter();
   const dispatch = useDispatch();
+  const [serverErrorLabel, setServerErrorLabel] = useState<string | null>(null);
 
   const mutation = useMutation({
     mutationFn: async (data: RegisterValues) => {
@@ -46,42 +49,54 @@ export default function RegisterPage() {
         email: data.email,
         phone: data.phone,
         password: data.password,
+        confirmPassword: data.confirmPassword,
       };
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error('Register gagal');
-      return res.json();
+      const res = await registerUser(payload);
+      return res;
     },
     onSuccess: async (_, variables) => {
-      const loginRes = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: variables.email, password: variables.password }),
-      });
-      if (loginRes.ok) {
-        const loginJson = await loginRes.json();
-        const token: string | undefined = loginJson?.token;
-        dispatch(
-          setAuth({ token, user: { email: variables.email, name: variables.name, username: variables.username, phone: variables.phone } })
-        );
-        saveAuth(token, { email: variables.email, name: variables.name, username: variables.username, phone: variables.phone });
-        router.push('/profile/edit');
-      } else {
-        router.push('/login');
-      }
+      const user = {
+        email: variables.email,
+        name: variables.name,
+        username: variables.username,
+        phone: variables.phone,
+      };
+      const raw = mutation.data;
+      const token = raw?.token;
+      dispatch(setAuth({ token, user }));
+      saveAuth(token, user);
+      router.push('/login?registered=1');
+    },
+    onError: (err) => {
+      const label = err instanceof Error ? err.message : 'Register gagal';
+      setServerErrorLabel(label);
     },
   });
 
   const onSubmit = (values: RegisterValues) => mutation.mutate(values);
 
+  const clientErrorLabel = useMemo(() => {
+    const errs = form.formState.errors;
+    const parts: string[] = [];
+    const labels: [keyof RegisterValues, string][] = [
+      ['name', 'Name'],
+      ['username', 'Username'],
+      ['email', 'Email'],
+      ['phone', 'Number Phone'],
+      ['password', 'Password'],
+      ['confirmPassword', 'Confirm Password'],
+    ];
+    for (const [key, label] of labels) {
+      const e = errs[key];
+      if (e?.message) parts.push(`${label}: ${e.message}`);
+    }
+    if (parts.length === 0) return null;
+    return `Perbaiki: ${parts.join('; ')}`;
+  }, [form.formState.errors]);
+
   return (
     <AuthTemplate>
-      <AuthCard 
-      title='Register'
-      className="w-[clamp(345px,36.31vw,523px)]">
+      <AuthCard title='Register' className='w-[clamp(345px,36.31vw,523px)]'>
         <form
           className='flex flex-col gap-xl md:gap-3xl w-[clamp(313px,32.98vw,475px)] justify-self-center'
           onSubmit={form.handleSubmit(onSubmit)}
@@ -131,15 +146,25 @@ export default function RegisterPage() {
           <Button type='submit' loading={mutation.isPending}>
             Submit
           </Button>
-          {mutation.isError && (
-            <div className='mt-xl'><AlertBanner label='Register gagal' variant='danger' /></div>
+          {(mutation.isError || !!clientErrorLabel) && (
+            <div className='mt-xl'>
+              <AlertBanner
+                label={serverErrorLabel ?? clientErrorLabel ?? 'Register gagal'}
+                variant='danger'
+              />
+            </div>
           )}
           {mutation.isSuccess && (
-            <div className='mt-xl'><AlertBanner label='Registered' variant='success' /></div>
+            <div className='mt-xl'>
+              <AlertBanner label='Registered' variant='success' />
+            </div>
           )}
           <p className='text-sm md:text-md font-semibold text-neutral-300 text-center'>
             Already have an account?{' '}
-            <a href='/login' className='text-primary-200 text-sm md:text-md font-bold'>
+            <a
+              href='/login'
+              className='text-primary-200 text-sm md:text-md font-bold'
+            >
               Log in
             </a>
           </p>

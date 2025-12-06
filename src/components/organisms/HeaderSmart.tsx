@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Header from './Header';
 import { RootState } from '../../store';
 import { setMobileAuthOpen, setMobileSearchOpen } from '../../store/uiSlice';
+import { loadAuth } from '../../lib/authStorage';
 
 export default function HeaderSmart() {
   const dispatch = useDispatch();
@@ -11,6 +12,7 @@ export default function HeaderSmart() {
   const mobileAuthOpen = useSelector((s: RootState) => s.ui.mobileAuthOpen);
   const mobileSearchOpen = useSelector((s: RootState) => s.ui.mobileSearchOpen);
   const [isMdUp, setIsMdUp] = useState(false);
+  const saved = typeof window !== 'undefined' ? loadAuth() : undefined;
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 768px)');
@@ -20,7 +22,7 @@ export default function HeaderSmart() {
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  const hasToken = !!token;
+  const hasToken = !!token || !!saved?.token;
 
   const variant = (() => {
     if (isMdUp) return hasToken ? 'after-login' : 'before-login';

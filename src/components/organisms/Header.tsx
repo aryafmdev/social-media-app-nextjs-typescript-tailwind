@@ -5,10 +5,13 @@ import Avatar from '../atoms/Avatar';
 import SearchBar from '../molecules/SearchBar';
 import { Icon } from '@iconify/react';
 import { useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { clearAuth } from '../../store/authSlice';
-import { clearAuthStorage } from '../../lib/authStorage';
+import { clearAuthStorage, loadAuth } from '../../lib/authStorage';
+import { RootState } from '../../store';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getMe } from '../../lib/api/me';
 
 type Variant =
   | 'before-login'
@@ -19,7 +22,6 @@ type Variant =
   | 'after-login-mobile'
   | 'mobile-profile'
   | 'mobile-edit-profile';
-  
 
 export default function Header({
   variant,
@@ -33,6 +35,25 @@ export default function Header({
   const router = useRouter();
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const user = useSelector((s: RootState) => s.auth.user);
+  const savedAuth = typeof window !== 'undefined' ? loadAuth() : undefined;
+  const token = useSelector((s: RootState) => s.auth.token);
+  const effectiveToken =
+    typeof window !== 'undefined' ? (token ?? savedAuth?.token ?? null) : null;
+  const me = useQuery({
+    queryKey: ['me', 'header'],
+    queryFn: () => getMe(effectiveToken as string),
+    enabled: !!effectiveToken,
+  });
+  const displayName = [
+    user?.name,
+    user?.username,
+    me.data?.name,
+    me.data?.username,
+    savedAuth?.user?.name,
+    savedAuth?.user?.username,
+  ].find((v) => typeof v === 'string' && v.trim().length > 0) ?? '';
+  const avatarSrc = me.data?.avatarUrl;
 
   const base =
     'bg-black sticky top-0 z-50 border-b border-neutral-900 md:px-2xl lg:px-8xl';
@@ -146,10 +167,12 @@ export default function Header({
         </div>
         <div className='flex items-center gap-md text-3xl'>
           <IconButton>
-            <Icon icon='lucide:search' className='md:hidden' />
+            <Icon icon='lucide:search' className='md:hidden cursor-pointer' />
           </IconButton>
-          <Avatar />
-          <span className='text-neutral-25 font-medium text-md'>John Doe</span>
+          <Avatar src={avatarSrc} />
+          <span className='text-neutral-25 font-medium text-md'>
+            {displayName || 'User'}
+          </span>
           <IconButton
             onClick={() => {
               clearAuthStorage();
@@ -158,7 +181,7 @@ export default function Header({
             }}
             aria-label='Logout'
           >
-            <Icon icon='lucide:log-out' />
+            <Icon icon='lucide:log-out' className='text-2xl cursor-pointer' />
           </IconButton>
         </div>
       </header>
@@ -173,9 +196,9 @@ export default function Header({
         <Brand />
         <div className='flex items-center gap-md text-3xl'>
           <IconButton onClick={onToggleSearchAction}>
-            <Icon icon='lucide:search' />
+            <Icon icon='lucide:search' className='md:hidden cursor-pointer' />
           </IconButton>
-          <Avatar />
+          <Avatar src={avatarSrc} />
           <IconButton
             onClick={() => {
               clearAuthStorage();
@@ -184,7 +207,7 @@ export default function Header({
             }}
             aria-label='Logout'
           >
-            <Icon icon='lucide:log-out' />
+            <Icon icon='lucide:log-out' className='text-2xl cursor-pointer' />
           </IconButton>
         </div>
       </header>
@@ -203,10 +226,12 @@ export default function Header({
           >
             <Icon icon='lucide:arrow-left' />
           </IconButton>
-          <span className='text-neutral-25 font-bold text-md'>John Doe</span>
+          <span className='text-neutral-25 font-bold text-md'>
+            {displayName || '-'}
+          </span>
         </div>
         <div className='flex items-center gap-md'>
-          <Avatar />
+          <Avatar src={avatarSrc} />
           <IconButton
             onClick={() => {
               clearAuthStorage();
@@ -215,7 +240,7 @@ export default function Header({
             }}
             aria-label='Logout'
           >
-            <Icon icon='lucide:log-out' />
+            <Icon icon='lucide:log-out' className='text-2xl cursor-pointer' />
           </IconButton>
         </div>
       </header>
@@ -234,10 +259,12 @@ export default function Header({
           >
             <Icon icon='lucide:arrow-left' />
           </IconButton>
-          <span className='text-neutral-25 font-bold text-md'>Edit Profile</span>
+          <span className='text-neutral-25 font-bold text-md'>
+            Edit Profile
+          </span>
         </div>
         <div className='flex items-center gap-md'>
-          <Avatar />
+          <Avatar src={avatarSrc} />
           <IconButton
             onClick={() => {
               clearAuthStorage();
@@ -246,7 +273,7 @@ export default function Header({
             }}
             aria-label='Logout'
           >
-            <Icon icon='lucide:log-out' />
+            <Icon icon='lucide:log-out' className='text-2xl cursor-pointer' />
           </IconButton>
         </div>
       </header>

@@ -2,13 +2,19 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { publicApiBaseUrl } from "../../../../lib/env";
 
-const RegisterSchema = z.object({
-  name: z.string().min(2),
-  username: z.string().min(3),
-  email: z.string().email(),
-  phone: z.string().min(8),
-  password: z.string().min(6),
-});
+const RegisterSchema = z
+  .object({
+    name: z.string().min(2),
+    username: z.string().min(3),
+    email: z.string().email(),
+    phone: z.string().min(8),
+    password: z.string().min(6),
+    confirmPassword: z.string().min(6),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: 'Password tidak sama',
+    path: ['confirmPassword'],
+  });
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
