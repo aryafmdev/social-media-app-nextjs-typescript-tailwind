@@ -24,6 +24,7 @@ export default function Providers({ children }: { children: ReactNode }) {
             name: (me.name && me.name.trim()) || user?.name,
             username: (me.username && me.username.trim()) || user?.username,
             phone: (me.phone && me.phone.trim()) || user?.phone,
+            bio: (me.bio && me.bio.trim()) || user?.bio,
           };
           store.dispatch(setAuth({ token, user: updatedUser }));
           saveAuth(token, updatedUser);

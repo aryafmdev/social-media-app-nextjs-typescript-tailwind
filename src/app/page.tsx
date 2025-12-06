@@ -1,5 +1,7 @@
 'use client';
 import HeaderSmart from '../components/organisms/HeaderSmart';
+import AlertBanner from '../components/organisms/AlertBanner';
+import { useSearchParams } from 'next/navigation';
 import MenuBar from '../components/molecules/MenuBar';
 import PostCard from '../components/organisms/PostCard';
 import { useSelector } from 'react-redux';
@@ -19,6 +21,11 @@ export default function Home() {
   return (
     <main className='min-h-screen bg-black'>
       <HeaderSmart />
+      {useSearchParams().get('posted') === '1' && (
+        <section className='mx-auto px-7xl py-md'>
+          <AlertBanner variant='success' label='Success Post' />
+        </section>
+      )}
       {ready && (
         <section className='mx-auto px-7xl py-7xl flex flex-col gap-4xl'>
           {feed.data?.items?.map((p) => (

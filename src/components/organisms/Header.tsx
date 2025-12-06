@@ -27,10 +27,12 @@ export default function Header({
   variant,
   onToggleSearchAction,
   onToggleAuthAction,
+  title,
 }: {
   variant?: Variant;
   onToggleSearchAction?: () => void;
   onToggleAuthAction?: () => void;
+  title?: string;
 }) {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -267,7 +269,7 @@ export default function Header({
             <Icon icon='lucide:arrow-left' />
           </IconButton>
           <span className='text-neutral-25 font-bold text-md'>
-            Edit Profile
+            {title ?? 'Edit Profile'}
           </span>
         </div>
         <div className='flex items-center gap-md'>
