@@ -9,6 +9,25 @@ function toNumber(v: unknown, fallback = 0): number {
   return fallback;
 }
 
+function findFirstStringDeep(src: unknown, keys: string[]): string | undefined {
+  if (!src || typeof src !== 'object') return undefined;
+  const stack: Record<string, unknown>[] = [src as Record<string, unknown>];
+  const seen = new Set<object>();
+  while (stack.length) {
+    const cur = stack.pop()!;
+    if (seen.has(cur)) continue;
+    seen.add(cur);
+    for (const k of keys) {
+      const v = (cur as Record<string, unknown>)[k];
+      if (typeof v === 'string' && v.trim().length > 0) return v;
+    }
+    for (const v of Object.values(cur)) {
+      if (v && typeof v === 'object') stack.push(v as Record<string, unknown>);
+    }
+  }
+  return undefined;
+}
+
 function normalizePost(raw: Record<string, unknown>): Post {
   const idRaw = (raw['id'] ?? raw['postId']) as unknown;
   const id = typeof idRaw === 'string' ? idRaw : String(idRaw ?? '');
@@ -32,7 +51,57 @@ function normalizePost(raw: Record<string, unknown>): Post {
     typeof savedCandidate === 'boolean' ? savedCandidate : undefined;
   const likesCount = toNumber(raw['likesCount'] ?? raw['likes']);
   const commentsCount = toNumber(raw['commentsCount'] ?? raw['comments']);
-  return { id, imageUrl, caption, liked, saved, likesCount, commentsCount };
+  const createdAtCandidate = (raw['createdAt'] ??
+    raw['created_at'] ??
+    raw['timestamp'] ??
+    raw['postedAt']) as unknown;
+  const createdAt =
+    typeof createdAtCandidate === 'string' ? createdAtCandidate : undefined;
+  const authorCandidate = (raw['author'] ??
+    raw['user'] ??
+    raw['owner'] ??
+    raw['createdBy'] ??
+    raw['created_by'] ??
+    raw['postedBy'] ??
+    raw['posted_by']) as unknown;
+  const authorRoot =
+    authorCandidate && typeof authorCandidate === 'object'
+      ? (authorCandidate as Record<string, unknown>)
+      : raw;
+  const authorUsername =
+    findFirstStringDeep(authorRoot, ['username', 'user_name', 'handle']) ||
+    (typeof raw['username'] === 'string' ? raw['username'] : undefined);
+  const authorName =
+    findFirstStringDeep(authorRoot, ['name', 'fullName', 'displayName']) ||
+    (typeof raw['name'] === 'string' ? raw['name'] : undefined);
+  const authorAvatar = findFirstStringDeep(authorRoot, [
+    'avatarUrl',
+    'avatar_url',
+    'image',
+    'photo',
+    'profilePicture',
+    'profile_picture',
+  ]);
+  const author: Post['author'] | undefined = (() => {
+    if (authorUsername || authorName || authorAvatar)
+      return {
+        username: (authorUsername ?? authorName ?? '').trim(),
+        name: authorName,
+        avatarUrl: authorAvatar,
+      };
+    return undefined;
+  })();
+  return {
+    id,
+    imageUrl,
+    caption,
+    liked,
+    saved,
+    likesCount,
+    commentsCount,
+    createdAt,
+    author,
+  };
 }
 
 export async function getFeed(

@@ -40,9 +40,9 @@ export default function ProfileContent({
   const list: { id: string }[] =
     items && items.length > 0 ? items.map((p) => ({ id: p.id })) : placeholder;
   const grid = (
-    <div className='mt-2xl grid grid-cols-3 gap-md'>
+    <div className='mt-2xl grid grid-cols-3 gap-xs'>
       {list.map((item) => (
-        <div key={item.id} className='bg-neutral-800 rounded-xl h-[110px]' />
+        <div key={item.id} className='bg-neutral-800 rounded-xs h-[110px]' />
       ))}
     </div>
   );

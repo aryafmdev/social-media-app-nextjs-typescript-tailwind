@@ -12,15 +12,24 @@ export default function PostCard({
   post: Post;
 }) {
   const imgClass =
-  variant === 'md'
-    ? 'w-[clamp(361px,calc(361px + (239 * (100vw - 393px) / 1047)),600px)] h-[clamp(361px,calc(361px + (239 * (100vw - 393px) / 1047)),600px)]'
-    : 'size-[361px]';
+    variant === 'md'
+      ? 'w-[clamp(361px,calc(361px + (239 * (100vw - 393px) / 1047)),600px)] h-[clamp(361px,calc(361px + (239 * (100vw - 393px) / 1047)),600px)]'
+      : 'size-[361px]';
 
   const [expanded, setExpanded] = useState(false);
+  const authorDisplayName =
+    (post.author?.name && post.author?.name.trim()) ||
+    (post.author?.username && post.author?.username.trim()) ||
+    'Username';
   return (
     <article className='border-b border-neutral-900 pb-2xl'>
-      <div className='mb-lg'>
-        <PostHeader />
+      <div className='mb-2xl'>
+        <PostHeader
+          name={post.author?.name}
+          username={post.author?.username}
+          avatarUrl={post.author?.avatarUrl}
+          createdAt={post.createdAt}
+        />
       </div>
       {post.imageUrl ? (
         <Image
@@ -30,7 +39,7 @@ export default function PostCard({
           height={600}
           className={`rounded-xl object-cover ${imgClass}`}
           style={{ width: '100%', height: 'auto' }}
-  sizes="(min-width: 768px) 600px, 100vw"
+          sizes='(min-width: 768px) 600px, 100vw'
         />
       ) : (
         <div className={`w-full rounded-xl bg-neutral-800 ${imgClass}`} />
@@ -45,7 +54,9 @@ export default function PostCard({
         />
       </div>
       <div className='mt-xl flex flex-col gap-xs'>
-        <span className='text-neutral-25 font-semibold'>Username</span>
+        <span className='text-neutral-25 font-semibold'>
+          {authorDisplayName}
+        </span>
         <p
           className='text-neutral-300 text-md'
           style={
@@ -63,7 +74,7 @@ export default function PostCard({
         </p>
         {!expanded && (
           <button
-            className='text-primary-200 text-sm font-semibold w-fit'
+            className='text-primary-200 text-sm font-semibold w-fit cursor-pointer'
             onClick={() => setExpanded(true)}
           >
             Show More

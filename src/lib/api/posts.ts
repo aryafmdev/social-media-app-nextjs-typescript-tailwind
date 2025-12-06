@@ -6,11 +6,10 @@ export type Post = {
   saved?: boolean;
   likesCount?: number;
   commentsCount?: number;
-};
-export type PostDetail = Post & {
-  author?: { username: string; name?: string };
+  author?: { username: string; name?: string; avatarUrl?: string };
   createdAt?: string;
 };
+export type PostDetail = Post;
 
 export async function createPost(
   token: string,
