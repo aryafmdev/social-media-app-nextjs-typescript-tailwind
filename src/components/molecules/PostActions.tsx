@@ -38,18 +38,26 @@ export default function PostActions({
   });
   return (
     <div className='flex items-center justify-between'>
-      <div className='flex items-center gap-3xl'>
+      <div className='flex items-center gap-xl text-3xl'>
         <button onClick={() => likeMut.mutate()} className='text-neutral-25'>
           <ActionCount
-            icon={liked ? 'lucide:heart' : 'lucide:heart'}
+            icon={liked ? 'line-md:heart-filled' : 'line-md:heart'}
             count={likesCount}
           />
         </button>
-        <ActionCount icon='lucide:message-circle' count={commentsCount} />
+        <ActionCount
+          icon='mdi:comment-processing-outline'
+          count={commentsCount}
+        />
         <ActionCount icon='lucide:send' count={0} />
       </div>
-      <button className='text-neutral-25' onClick={() => saveMut.mutate()}>
-        <Icon icon={saved ? 'lucide:bookmark' : 'lucide:bookmark'} />
+      <button
+        className='text-neutral-25 text-3xl'
+        onClick={() => saveMut.mutate()}
+      >
+        <Icon
+          icon={saved ? 'gravity-ui:bookmark-fill' : 'gravity-ui:bookmark'}
+        />
       </button>
     </div>
   );

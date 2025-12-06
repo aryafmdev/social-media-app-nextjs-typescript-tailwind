@@ -14,8 +14,8 @@ export default function PostCard({
   const imgClass = variant === 'md' ? 'h-[420px]' : 'h-[300px]';
   const [expanded, setExpanded] = useState(false);
   return (
-    <article className='rounded-2xl bg-neutral-900 border border-neutral-800 p-3xl'>
-      <div className='mb-2xl'>
+    <article className='border-b border-neutral-900 pb-2xl'>
+      <div className='mb-lg'>
         <PostHeader />
       </div>
       {post.imageUrl ? (
