@@ -11,7 +11,11 @@ export default function PostCard({
   variant?: 'mobile' | 'md';
   post: Post;
 }) {
-  const imgClass = variant === 'md' ? 'h-[420px]' : 'h-[300px]';
+  const imgClass =
+  variant === 'md'
+    ? 'w-[clamp(361px,calc(361px + (239 * (100vw - 393px) / 1047)),600px)] h-[clamp(361px,calc(361px + (239 * (100vw - 393px) / 1047)),600px)]'
+    : 'size-[361px]';
+
   const [expanded, setExpanded] = useState(false);
   return (
     <article className='border-b border-neutral-900 pb-2xl'>
@@ -22,9 +26,11 @@ export default function PostCard({
         <Image
           src={post.imageUrl}
           alt='post'
-          width={800}
-          height={450}
-          className={`w-full rounded-xl object-cover ${imgClass}`}
+          width={600}
+          height={600}
+          className={`rounded-xl object-cover ${imgClass}`}
+          style={{ width: '100%', height: 'auto' }}
+  sizes="(min-width: 768px) 600px, 100vw"
         />
       ) : (
         <div className={`w-full rounded-xl bg-neutral-800 ${imgClass}`} />
