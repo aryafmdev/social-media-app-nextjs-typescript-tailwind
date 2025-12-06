@@ -1,17 +1,18 @@
 import { ProfileTab } from '../molecules/ProfileTabs';
 import type { MyPost } from '../../lib/api/me';
+import { useRouter } from 'next/navigation';
 
 export default function ProfileContent({
   tab,
   hasPosts,
-  onUpload,
   items,
 }: {
   tab: ProfileTab;
   hasPosts: boolean;
-  onUpload?: () => void;
   items?: MyPost[];
 }) {
+  const router = useRouter();
+
   if (!hasPosts) {
     return (
       <div className='mt-2xl text-center'>
@@ -24,8 +25,8 @@ export default function ProfileContent({
         </p>
         <div className='mt-2xl flex justify-center'>
           <button
-            onClick={onUpload}
-            className='rounded-full bg-primary-300 text-md font-bold text-neutral-25 px-5xl py-md'
+            onClick={() => router.push('/posts/new')}
+            className="rounded-full bg-primary-300 text-md font-bold text-neutral-25 px-5xl py-md"
           >
             Upload My First Post
           </button>
