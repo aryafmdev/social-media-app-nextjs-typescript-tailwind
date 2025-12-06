@@ -17,56 +17,84 @@ export type UpdateMeInput = {
   avatarUrl?: string;
 };
 
-function pickFirstString(
-  obj: Record<string, unknown> | undefined,
+// removed: pickFirstString (unused)
+
+function findFirstStringDeep(src: unknown, keys: string[]): string | undefined {
+  if (!src || typeof src !== 'object') return undefined;
+  const stack: Record<string, unknown>[] = [src as Record<string, unknown>];
+  const seen = new Set<object>();
+  while (stack.length) {
+    const cur = stack.pop()!;
+    if (seen.has(cur)) continue;
+    seen.add(cur);
+    for (const k of keys) {
+      const v = cur[k];
+      if (typeof v === 'string' && v.trim().length > 0) return v;
+    }
+    for (const v of Object.values(cur)) {
+      if (v && typeof v === 'object') stack.push(v as Record<string, unknown>);
+    }
+  }
+  return undefined;
+}
+
+function findFirstNumberDeep(
+  src: unknown,
   keys: string[],
-  fallback?: string
-): string | undefined {
-  if (!obj) return fallback;
-  for (const k of keys) {
-    const v = obj[k];
-    if (typeof v === 'string' && v.trim().length > 0) return v;
+  fallback = 0
+): number {
+  if (!src || typeof src !== 'object') return fallback;
+  const stack: Record<string, unknown>[] = [src as Record<string, unknown>];
+  const seen = new Set<object>();
+  while (stack.length) {
+    const cur = stack.pop()!;
+    if (seen.has(cur)) continue;
+    seen.add(cur);
+    for (const k of keys) {
+      const v = cur[k];
+      if (typeof v === 'number' && Number.isFinite(v)) return v;
+      if (typeof v === 'string') {
+        const n = Number(v);
+        if (!Number.isNaN(n)) return n;
+      }
+    }
+    for (const v of Object.values(cur)) {
+      if (v && typeof v === 'object') stack.push(v as Record<string, unknown>);
+    }
   }
   return fallback;
 }
 
-function toNumber(x: unknown, fallback = 0): number {
-  if (typeof x === 'number' && Number.isFinite(x)) return x;
-  if (typeof x === 'string') {
-    const n = Number(x);
-    if (!Number.isNaN(n)) return n;
-  }
-  return fallback;
-}
+// removed: toNumber (unused)
 
 function parseMe(raw: Record<string, unknown>): Me {
-  const data =
+  const root =
     typeof raw.data === 'object' && raw.data !== null
       ? (raw.data as Record<string, unknown>)
       : raw;
-  const user =
-    typeof data.user === 'object' && data.user !== null
-      ? (data.user as Record<string, unknown>)
-      : data;
 
-  const name = pickFirstString(user, [
-    'name',
-    'fullName',
-    'full_name',
-    'displayName',
-    'display_name',
-    'nama',
-  ]);
-  const username = pickFirstString(user, ['username', 'user_name', 'handle']);
-  const email = pickFirstString(user, ['email']);
-  const phone = pickFirstString(user, [
+  const name =
+    findFirstStringDeep(root, [
+      'name',
+      'fullName',
+      'full_name',
+      'displayName',
+      'display_name',
+      'nama',
+      'nama_lengkap',
+    ]) ?? '';
+  const username =
+    findFirstStringDeep(root, ['username', 'user_name', 'handle']) ?? '';
+  const email = findFirstStringDeep(root, ['email']);
+  const phone = findFirstStringDeep(root, [
     'phone',
     'phoneNumber',
     'phone_number',
     'no_hp',
+    'tel',
   ]);
-  const bio = pickFirstString(user, ['bio', 'about', 'description']);
-  const avatarUrl = pickFirstString(user, [
+  const bio = findFirstStringDeep(root, ['bio', 'about', 'description']);
+  const avatarUrl = findFirstStringDeep(root, [
     'avatarUrl',
     'avatar_url',
     'avatar',
@@ -74,42 +102,54 @@ function parseMe(raw: Record<string, unknown>): Me {
     'image',
     'photo',
     'profilePicture',
+    'profile_picture',
   ]);
 
-  const statsSrc =
-    typeof user.stats === 'object' && user.stats !== null
-      ? (user.stats as Record<string, unknown>)
-      : typeof data.stats === 'object' && data.stats !== null
-        ? (data.stats as Record<string, unknown>)
-        : undefined;
+  const stats: Me['stats'] | undefined = (() => {
+    const post = findFirstNumberDeep(root, ['post', 'posts']);
+    const followers = findFirstNumberDeep(root, ['followers']);
+    const following = findFirstNumberDeep(root, ['following']);
+    const likes = findFirstNumberDeep(root, ['likes']);
+    if (post || followers || following || likes)
+      return { post, followers, following, likes };
+    return undefined;
+  })();
 
-  const stats = statsSrc
-    ? {
-        post: toNumber(statsSrc.post ?? statsSrc.posts),
-        followers: toNumber(statsSrc.followers),
-        following: toNumber(statsSrc.following),
-        likes: toNumber(statsSrc.likes),
-      }
-    : undefined;
-
-  return {
-    name: name ?? '',
-    username: username ?? '',
-    email,
-    phone,
-    bio,
-    avatarUrl,
-    stats,
-  };
+  return { name, username, email, phone, bio, avatarUrl, stats };
 }
 
 export async function getMe(token: string): Promise<Me> {
-  const res = await fetch(`/api/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error('Failed to fetch me');
-  const raw = (await res.json().catch(() => ({}))) as Record<string, unknown>;
-  return parseMe(raw);
+  try {
+    const res = await fetch(`/api/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error('Failed to fetch me');
+    const raw = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    return parseMe(raw);
+  } catch {
+    if (typeof window !== 'undefined') {
+      const saved = loadAuth();
+      const u = saved?.user;
+      return {
+        name: u?.name ?? '',
+        username: u?.username ?? '',
+        email: u?.email,
+        phone: u?.phone,
+        bio: '',
+        avatarUrl: undefined,
+        stats: undefined,
+      };
+    }
+    return {
+      name: '',
+      username: '',
+      email: undefined,
+      phone: undefined,
+      bio: '',
+      avatarUrl: undefined,
+      stats: undefined,
+    };
+  }
 }
 
 export async function patchMe(
@@ -129,7 +169,8 @@ export async function patchMe(
       body: fd,
     });
     if (!res.ok) throw new Error('Failed to update profile');
-    return res.json();
+    const raw = await res.json().catch(() => ({}) as Record<string, unknown>);
+    return parseMe(raw as Record<string, unknown>);
   }
   const res = await fetch(`/api/me`, {
     method: 'PATCH',
@@ -146,7 +187,8 @@ export async function patchMe(
     }),
   });
   if (!res.ok) throw new Error('Failed to update profile');
-  return res.json();
+  const raw = await res.json().catch(() => ({}) as Record<string, unknown>);
+  return parseMe(raw as Record<string, unknown>);
 }
 
 export type MyPost = { id: string; imageUrl?: string; createdAt?: string };
@@ -162,3 +204,4 @@ export async function getMyPosts(
   if (!res.ok) throw new Error('Failed to fetch my posts');
   return res.json();
 }
+import { loadAuth } from '../authStorage';

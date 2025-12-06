@@ -48,6 +48,7 @@ export default function EditProfilePage() {
     return undefined;
   }, [reduxUser, me.data, saved?.user]);
   const meProp = useMemo(() => {
+    if (me.data) return me.data as import('../../../lib/api/me').Me;
     if (reduxUser)
       return {
         name: reduxUser.name ?? '',
@@ -58,7 +59,6 @@ export default function EditProfilePage() {
         avatarUrl: undefined,
         stats: undefined,
       } as import('../../../lib/api/me').Me;
-    if (me.data) return me.data as import('../../../lib/api/me').Me;
     if (saved?.user)
       return {
         name: saved.user.name ?? '',

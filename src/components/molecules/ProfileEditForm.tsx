@@ -1,16 +1,19 @@
 'use client';
-import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { patchMe, Me, UpdateMeInput } from '../../lib/api/me';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import TextField from '../molecules/TextField';
 import { Button } from '../ui/button';
 import Avatar from '../atoms/Avatar';
 import Input from '../atoms/Input';
+import AlertBanner from '../organisms/AlertBanner';
+import { setAuth } from '../../store/authSlice';
+import { saveAuth, loadAuth } from '../../lib/authStorage';
 
 const fileListSchema = z.custom<FileList>(
   (v) => typeof FileList !== 'undefined' && v instanceof FileList,
@@ -30,6 +33,7 @@ const schema = z.object({
     .regex(/^\+?\d{8,15}$/i, 'Invalid phone'),
   bio: z.string().optional(),
   avatar: fileListSchema.optional(),
+  avatarUrl: z.union([z.string().url('Invalid URL'), z.literal('')]).optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -44,6 +48,7 @@ export default function ProfileEditForm({
   onDoneAction?: () => void;
 }) {
   const token = useSelector((s: RootState) => s.auth.token) as string;
+  const dispatch = useDispatch();
   const qc = useQueryClient();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -52,6 +57,7 @@ export default function ProfileEditForm({
       username: me.username ?? '',
       phone: me.phone ?? '',
       bio: me.bio ?? '',
+      avatarUrl: '',
     },
   });
   useEffect(() => {
@@ -62,25 +68,65 @@ export default function ProfileEditForm({
         phone: prefill.phone ?? form.getValues().phone ?? '',
         bio: prefill.bio ?? form.getValues().bio ?? '',
         avatar: undefined,
+        avatarUrl: '',
       });
     }
   }, [prefill, form]);
+  const watchedAvatar = useWatch({ control: form.control, name: 'avatar' });
+  const previewObj = useMemo(() => {
+    const f =
+      watchedAvatar && watchedAvatar.length > 0 ? watchedAvatar[0] : null;
+    if (f) {
+      const url = URL.createObjectURL(f as File);
+      return { src: url, revoke: () => URL.revokeObjectURL(url) };
+    }
+    return { src: prefill?.avatarUrl ?? me.avatarUrl, revoke: undefined };
+  }, [watchedAvatar, prefill?.avatarUrl, me.avatarUrl]);
+  useEffect(() => {
+    return previewObj.revoke;
+  }, [previewObj.src, previewObj.revoke]);
+  const [serverErrorLabel, setServerErrorLabel] = useState<string | null>(null);
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
       const files =
         values.avatar && values.avatar.length > 0 ? values.avatar[0] : null;
+      if (files && (files as File).size > 5 * 1024 * 1024) {
+        throw new Error('Image too large (max 5MB)');
+      }
       const input: UpdateMeInput = {
         name: values.name ?? undefined,
         username: values.username ?? undefined,
         phone: values.phone ?? undefined,
         bio: values.bio ?? undefined,
         avatar: files,
+        avatarUrl: !files
+          ? values.avatarUrl && values.avatarUrl.trim().length > 0
+            ? values.avatarUrl
+            : undefined
+          : undefined,
       };
       return patchMe(token, input);
     },
-    onSuccess: () => {
+    onSuccess: (updated) => {
       qc.invalidateQueries({ queryKey: ['me'] });
+      const saved = typeof window !== 'undefined' ? loadAuth() : undefined;
+      const mergedUser = {
+        email: saved?.user?.email ?? me.email ?? '',
+        name: updated?.name ?? form.getValues().name ?? saved?.user?.name,
+        username:
+          updated?.username ??
+          form.getValues().username ??
+          saved?.user?.username,
+        phone: updated?.phone ?? form.getValues().phone ?? saved?.user?.phone,
+      };
+      dispatch(setAuth({ token, user: mergedUser }));
+      saveAuth(token, mergedUser);
+      setServerErrorLabel(null);
       onDoneAction?.();
+    },
+    onError: (err) => {
+      const label = err instanceof Error ? err.message : 'Update failed';
+      setServerErrorLabel(label);
     },
   });
 
@@ -90,8 +136,8 @@ export default function ProfileEditForm({
       onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
     >
       <div className='flex flex-col items-center gap-xl'>
-        <Avatar size={80} src={prefill?.avatarUrl ?? me.avatarUrl} />
-        <label className='rounded-full w-[160px] h-[40px] border border-neutral-700 text-sm md:text-md font-bold text-neutral-25 flex items-center justify-center cursor-pointer'>
+        <Avatar size={80} src={previewObj.src} />
+        <label className='rounded-full w-[160px] h-[40px] border border-neutral-700 hover:bg-neutral-800 text-sm md:text-md font-bold text-neutral-25 flex items-center justify-center cursor-pointer'>
           Change Photo
           <input
             type='file'
@@ -100,6 +146,10 @@ export default function ProfileEditForm({
             className='hidden'
           />
         </label>
+        <Input
+          {...form.register('avatarUrl')}
+          placeholder='Alternative avatar URL'
+        />
       </div>
       <TextField<FormValues>
         label='Name'
@@ -117,7 +167,11 @@ export default function ProfileEditForm({
       />
       <div className='flex flex-col gap-xs'>
         <label className='text-sm font-bold text-neutral-50'>Email</label>
-        <Input value={me.email ?? ''} readOnly placeholder='email@example.com' />
+        <Input
+          value={me.email ?? ''}
+          readOnly
+          placeholder='email@example.com'
+        />
       </div>
       <TextField<FormValues>
         label='Number Phone'
@@ -135,8 +189,19 @@ export default function ProfileEditForm({
           placeholder='Your bio'
         />
       </div>
-      <Button type='submit'
-      className='w-full rounded-full bg-primary-300 text-neutral-25 font-bold text-sm'>Save Changes</Button>
+      <Button
+        type='submit'
+        disabled={mutation.isPending}
+        className='w-full rounded-full h-[40px] bg-primary-300  hover:bg-primary-200 text-neutral-25 font-bold text-sm cursor-pointer'
+      >
+        Save Changes
+      </Button>
+      {(mutation.isError || !!serverErrorLabel) && (
+        <AlertBanner
+          label={serverErrorLabel ?? 'Update failed'}
+          variant='danger'
+        />
+      )}
     </form>
   );
 }
