@@ -3,9 +3,10 @@ import { publicApiBaseUrl } from '../../../../lib/env';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { username: string } }
+  context: { params: Promise<{ username: string }> }
 ) {
-  const res = await fetch(`${publicApiBaseUrl}/api/follow/${params.username}`, {
+  const { username } = await context.params;
+  const res = await fetch(`${publicApiBaseUrl}/api/follow/${username}`, {
     method: 'POST',
     headers: { Authorization: req.headers.get('authorization') || '' },
   });
@@ -20,9 +21,10 @@ export async function POST(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { username: string } }
+  context: { params: Promise<{ username: string }> }
 ) {
-  const res = await fetch(`${publicApiBaseUrl}/api/follow/${params.username}`, {
+  const { username } = await context.params;
+  const res = await fetch(`${publicApiBaseUrl}/api/follow/${username}`, {
     method: 'DELETE',
     headers: { Authorization: req.headers.get('authorization') || '' },
   });

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '../../components/organisms/Header';
@@ -18,6 +18,14 @@ import { loadAuth } from '../../lib/authStorage';
 import AlertBanner from '../../components/organisms/AlertBanner';
 
 export default function ProfilePage() {
+  return (
+    <Suspense fallback={null}>
+      <ProfilePageContent />
+    </Suspense>
+  );
+}
+
+function ProfilePageContent() {
   const token = useSelector((s: RootState) => s.auth.token);
   const reduxUser = useSelector((s: RootState) => s.auth.user);
   const router = useRouter();

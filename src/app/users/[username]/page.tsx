@@ -27,7 +27,7 @@ export default function PublicProfilePage() {
   const likes = useQuery({
     queryKey: ['user', username, 'likes', 1, 20],
     queryFn: () => getUserLikes(username as string, 1, 20),
-    enabled: !!username && tab === 'liked',
+    enabled: !!username && tab === 'saved',
   });
   const hasPosts = (posts.data?.items?.length ?? 0) > 0;
   return (
@@ -45,7 +45,7 @@ export default function PublicProfilePage() {
         <ProfileContent
           tab={tab}
           hasPosts={hasPosts}
-          items={tab === 'liked' ? likes.data?.items : posts.data?.items}
+          items={tab === 'saved' ? likes.data?.items : posts.data?.items}
         />
       </ProfileTemplate>
     </main>

@@ -8,9 +8,17 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { useQuery } from '@tanstack/react-query';
 import { getFeed } from '../lib/api/feed';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
 export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const token = useSelector((s: RootState) => s.auth.token);
   const ready = !!token;
   const feed = useQuery({
@@ -24,27 +32,20 @@ export default function Home() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-  if (searchParams.get('posted') === '1') {
-    // tampilkan banner lewat timer agar tidak dianggap synchronous setState
-    const timerShow = setTimeout(() => {
-      setShowBanner(true);
-
-      // hilangkan setelah 1 detik
-      const timerHide = setTimeout(() => {
-        setShowBanner(false);
-      }, 1000);
-
-      // hapus query param supaya tidak muncul lagi
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete('posted');
-      router.replace(`/?${params.toString()}`);
-
-      return () => clearTimeout(timerHide);
-    }, 0);
-
-    return () => clearTimeout(timerShow);
-  }
-}, [searchParams, router]);
+    if (searchParams.get('posted') === '1') {
+      const timerShow = setTimeout(() => {
+        setShowBanner(true);
+        const timerHide = setTimeout(() => {
+          setShowBanner(false);
+        }, 1000);
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete('posted');
+        router.replace(`/?${params.toString()}`);
+        return () => clearTimeout(timerHide);
+      }, 0);
+      return () => clearTimeout(timerShow);
+    }
+  }, [searchParams, router]);
 
   return (
     <main className='min-h-screen bg-black'>

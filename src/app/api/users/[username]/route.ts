@@ -3,9 +3,10 @@ import { publicApiBaseUrl } from '../../../../lib/env';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { username: string } }
+  context: { params: Promise<{ username: string }> }
 ) {
-  const res = await fetch(`${publicApiBaseUrl}/api/users/${params.username}`, {
+  const { username } = await context.params;
+  const res = await fetch(`${publicApiBaseUrl}/api/users/${username}`, {
     headers: { Authorization: req.headers.get('authorization') || '' },
     cache: 'no-store',
   });
