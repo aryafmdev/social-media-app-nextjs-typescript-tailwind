@@ -219,19 +219,6 @@ export default function CommentsDrawer({ open, onCloseAction, postId }: Props) {
                 '😢',
                 '😭',
                 '😡',
-                '👍',
-                '🙏',
-                '✨',
-                '🔥',
-                '🎉',
-                '💯',
-                '❤️',
-                '💖',
-                '💙',
-                '💚',
-                '💛',
-                '💜',
-                '🧡',
               ].map((em) => (
                 <button
                   key={em}
