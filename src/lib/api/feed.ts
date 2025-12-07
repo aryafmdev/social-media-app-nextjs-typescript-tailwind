@@ -64,9 +64,17 @@ function normalizePost(raw: Record<string, unknown>): Post {
     }
     return undefined;
   })();
-  const savedCandidate = (raw['saved'] ?? raw['isSaved']) as unknown;
-  const saved =
-    typeof savedCandidate === 'boolean' ? savedCandidate : undefined;
+  const savedCandidate = (raw['saved'] ?? raw['isSaved'] ?? raw['savedByMe'] ?? raw['isSavedByMe'] ?? raw['saved_by_me'] ?? raw['bookmarked'] ?? raw['isBookmarked']) as unknown;
+  const saved = (() => {
+    if (typeof savedCandidate === 'boolean') return savedCandidate;
+    const savesList = (raw as Record<string, unknown>)['saves'] ?? (raw as Record<string, unknown>)['bookmarks'] ?? (raw as Record<string, unknown>)['savedBy'] ?? (raw as Record<string, unknown>)['saved_by'];
+    if (Array.isArray(savesList)) {
+      for (const it of savesList) {
+        if (it && typeof it === 'object' && (it as Record<string, unknown>)['isMe'] === true) return true;
+      }
+    }
+    return undefined;
+  })();
   const likesCount = toNumber(
     (raw as Record<string, unknown>)['likesCount'] ??
       (raw as Record<string, unknown>)['likeCount'] ??

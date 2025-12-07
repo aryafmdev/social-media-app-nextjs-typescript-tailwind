@@ -62,12 +62,89 @@ export default function PostActions({
     },
   });
   const saveMut = useMutation({
-    mutationFn: async () =>
-      saved ? unsavePost(token, postId) : savePost(token, postId),
+    mutationFn: async (nextSaved: boolean) =>
+      nextSaved ? savePost(token, postId) : unsavePost(token, postId),
+    onMutate: async (nextSaved) => {
+      const apply = (p: import('../../lib/api/posts').Post) => ({
+        ...p,
+        saved: nextSaved,
+      });
+      const feedUpdater = (
+        old: { items: import('../../lib/api/posts').Post[] } | undefined
+      ) => {
+        if (!old || !Array.isArray(old.items)) return old;
+        const items = old.items.map((p) => (p.id === postId ? apply(p) : p));
+        return { ...old, items };
+      };
+      qc.setQueriesData<{ items: import('../../lib/api/posts').Post[] }>(
+        { queryKey: ['feed'] },
+        feedUpdater
+      );
+      qc.setQueryData<{ items: import('../../lib/api/posts').Post[] }>(
+        ['feed', 1, 10],
+        feedUpdater
+      );
+      qc.setQueryData<import('../../lib/api/posts').Post>(
+        ['post', postId],
+        (prev) => (prev ? apply(prev) : prev)
+      );
+      // Sync Tab Saved optimistically
+      const feed10 = qc.getQueryData<{
+        items: import('../../lib/api/posts').Post[];
+      }>(['feed', 1, 10]);
+      const fromFeed = feed10?.items.find((p) => p.id === postId);
+      const fromDetail = qc.getQueryData<import('../../lib/api/posts').Post>([
+        'post',
+        postId,
+      ]);
+      const candidate = (fromFeed || fromDetail) as
+        | import('../../lib/api/posts').Post
+        | undefined;
+      qc.setQueryData<{ items: import('../../lib/api/posts').Post[] }>(
+        ['me', 'saved', 1, 20],
+        (prev) => {
+          const items = Array.isArray(prev?.items) ? [...prev!.items] : [];
+          const idx = items.findIndex((it) => it.id === postId);
+          if (nextSaved) {
+            if (idx < 0 && candidate)
+              items.unshift({ ...candidate, saved: true });
+          } else {
+            if (idx >= 0) items.splice(idx, 1);
+          }
+          return { items };
+        }
+      );
+    },
+    onError: () => {
+      qc.invalidateQueries({ queryKey: ['feed'] });
+      qc.invalidateQueries({ queryKey: ['post', postId] });
+      qc.invalidateQueries({ queryKey: ['me', 'saved'] });
+      qc.invalidateQueries({ queryKey: ['me'] });
+    },
     onSuccess: () => {
-      qc.invalidateQueries();
+      qc.invalidateQueries({ queryKey: ['feed'] });
+      qc.invalidateQueries({ queryKey: ['post', postId] });
+      qc.invalidateQueries({ queryKey: ['me', 'saved'] });
+      qc.invalidateQueries({ queryKey: ['me'] });
     },
   });
+  const savedState = (() => {
+    const feed10 = qc.getQueryData<{
+      items: import('../../lib/api/posts').Post[];
+    }>(['feed', 1, 10]);
+    const fromFeed = feed10?.items.find((p) => p.id === postId)?.saved;
+    const fromDetail = qc.getQueryData<import('../../lib/api/posts').Post>([
+      'post',
+      postId,
+    ])?.saved;
+    const meSavedList = qc.getQueryData<{
+      items: import('../../lib/api/posts').Post[];
+    }>(['me', 'saved', 1, 20]);
+    const fromSavedList = meSavedList?.items?.some((it) => it.id === postId)
+      ? true
+      : undefined;
+    return fromFeed ?? fromDetail ?? fromSavedList ?? saved ?? false;
+  })();
   return (
     <>
       <div className='flex items-center justify-between'>
@@ -109,10 +186,16 @@ export default function PostActions({
         </div>
         <button
           className='text-neutral-25 text-3xl cursor-pointer'
-          onClick={() => saveMut.mutate()}
+          onClick={() => {
+            if (saveMut.isPending) return;
+            const next = !savedState;
+            saveMut.mutate(next);
+          }}
         >
           <Icon
-            icon={saved ? 'gravity-ui:bookmark-fill' : 'gravity-ui:bookmark'}
+            icon={
+              savedState ? 'gravity-ui:bookmark-fill' : 'gravity-ui:bookmark'
+            }
           />
         </button>
       </div>
