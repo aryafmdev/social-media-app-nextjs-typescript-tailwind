@@ -8,6 +8,7 @@ import { RootState } from '../../store';
 import { likePost, unlikePost } from '../../lib/api/likes';
 import { savePost, unsavePost } from '../../lib/api/saves';
 import CommentsDrawer from '../organisms/CommentsDrawer';
+import LikesDrawer from '../organisms/LikesDrawer';
 
 export default function PostActions({
   postId,
@@ -25,6 +26,7 @@ export default function PostActions({
   const token = useSelector((s: RootState) => s.auth.token) as string;
   const qc = useQueryClient();
   const [openComments, setOpenComments] = useState(false);
+  const [openLikes, setOpenLikes] = useState(false);
   const likeMut = useMutation({
     mutationFn: async (nextLiked: boolean) =>
       nextLiked ? likePost(token, postId) : unlikePost(token, postId),
@@ -184,6 +186,32 @@ export default function PostActions({
           </button>
           <ActionCount icon='lucide:send' count={0} />
         </div>
+
+        <div className='flex justify-between gap-xl'>
+          <button
+            className='text-neutral-25 px-lg py-xs text-xl cursor-pointer'
+            onClick={() => setOpenLikes(true)}
+            aria-label='open-likes'
+          >
+            {likesCount} Likes
+          </button>
+        
+        {openComments && (
+          <CommentsDrawer
+            open={openComments}
+            onCloseAction={() => setOpenComments(false)}
+            postId={postId}
+          />
+        )}
+        {openLikes && (
+          <LikesDrawer
+            open={openLikes}
+            onCloseAction={() => setOpenLikes(false)}
+            postId={postId}
+          />
+        )}
+
+
         <button
           className='text-neutral-25 text-3xl cursor-pointer'
           onClick={() => {
@@ -198,14 +226,8 @@ export default function PostActions({
             }
           />
         </button>
+        </div>
       </div>
-      {openComments && (
-        <CommentsDrawer
-          open={openComments}
-          onCloseAction={() => setOpenComments(false)}
-          postId={postId}
-        />
-      )}
     </>
   );
 }
