@@ -2,6 +2,7 @@ import type { Post } from './posts';
 
 function toNumber(v: unknown, fallback = 0): number {
   if (typeof v === 'number' && Number.isFinite(v)) return v;
+  if (Array.isArray(v)) return v.length;
   if (typeof v === 'string') {
     const n = Number(v);
     if (!Number.isNaN(n)) return n;
@@ -43,13 +44,36 @@ function normalizePost(raw: Record<string, unknown>): Post {
     raw['description']) as unknown;
   const caption =
     typeof captionCandidate === 'string' ? captionCandidate : undefined;
-  const likedCandidate = (raw['liked'] ?? raw['isLiked']) as unknown;
-  const liked =
-    typeof likedCandidate === 'boolean' ? likedCandidate : undefined;
+  const likedCandidate = (raw['liked'] ??
+    raw['isLiked'] ??
+    raw['likedByMe'] ??
+    raw['isLikedByMe'] ??
+    raw['liked_by_me']) as unknown;
+  const liked = (() => {
+    if (typeof likedCandidate === 'boolean') return likedCandidate;
+    const likesList = raw['likes'] as unknown;
+    if (Array.isArray(likesList)) {
+      for (const it of likesList) {
+        if (
+          it &&
+          typeof it === 'object' &&
+          (it as Record<string, unknown>)['isMe'] === true
+        )
+          return true;
+      }
+    }
+    return undefined;
+  })();
   const savedCandidate = (raw['saved'] ?? raw['isSaved']) as unknown;
   const saved =
     typeof savedCandidate === 'boolean' ? savedCandidate : undefined;
-  const likesCount = toNumber(raw['likesCount'] ?? raw['likes']);
+  const likesCount = toNumber(
+    (raw as Record<string, unknown>)['likesCount'] ??
+      (raw as Record<string, unknown>)['likeCount'] ??
+      (raw as Record<string, unknown>)['totalLikes'] ??
+      (raw as Record<string, unknown>)['likes_total'] ??
+      raw['likes']
+  );
   const commentsCount = toNumber(
     raw['commentsCount'] ??
       raw['comments'] ??
