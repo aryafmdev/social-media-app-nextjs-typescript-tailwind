@@ -89,7 +89,7 @@ export default function SearchBar({
           <button onClick={() => setQuery('')} aria-label='clear-query'>
             <Icon
               icon='lucide:x'
-              className='text-neutral-950 bg-neutral-600 rounded-full size-5'
+              className='text-neutral-950 bg-neutral-600 rounded-full size-5 cursor-pointer'
             />
           </button>
         )}
@@ -97,7 +97,7 @@ export default function SearchBar({
 
       {onCloseAction && (
         <button onClick={onCloseAction} aria-label='close-search'>
-          <Icon icon='lucide:x' className='text-primary-100 size-6 md:hidden' />
+          <Icon icon='lucide:x' className='text-primary-100 size-6 md:hidden cursor-pointer' />
         </button>
       )}
 
