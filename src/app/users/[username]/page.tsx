@@ -38,19 +38,28 @@ export default function PublicProfilePage() {
     <main className='min-h-screen bg-neutral-950'>
       <HeaderSmart />
       <ProfileTemplate>
-        <ProfileHeader
-          name={user.data?.name}
-          username={user.data?.username}
-          avatarUrl={user.data?.avatarUrl}
-          stats={undefined}
-          onEdit={undefined}
-        />
-        <ProfileTabs active={tab} onChange={setTab} />
-        <ProfileContent
-          tab={tab}
-          hasPosts={hasPosts}
-          items={tab === 'saved' ? likes.data?.items : posts.data?.items}
-        />
+        {user.isError ? (
+          <div className='rounded-2xl bg-neutral-900 border border-neutral-800 p-3xl text-center'>
+            <div className='text-neutral-25 font-bold text-md'>User not found</div>
+            <div className='text-neutral-400 text-sm'>Change your keyword</div>
+          </div>
+        ) : (
+          <>
+            <ProfileHeader
+              name={user.data?.name}
+              username={user.data?.username}
+              avatarUrl={user.data?.avatarUrl}
+              stats={undefined}
+              onEdit={undefined}
+            />
+            <ProfileTabs active={tab} onChange={setTab} />
+            <ProfileContent
+              tab={tab}
+              hasPosts={hasPosts}
+              items={tab === 'saved' ? likes.data?.items : posts.data?.items}
+            />
+          </>
+        )}
       </ProfileTemplate>
     </main>
   );
