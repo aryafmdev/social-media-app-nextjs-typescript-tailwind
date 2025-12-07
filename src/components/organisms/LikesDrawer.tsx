@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { getPostLikes } from '../../lib/api/likes';
 import { followUser, unfollowUser } from '../../lib/api/follow';
+import type { Me } from '../../lib/api/me';
 
 export default function LikesDrawer({
   open,
@@ -36,6 +37,71 @@ export default function LikesDrawer({
       username: string;
       next: boolean;
     }) => (next ? followUser(token, username) : unfollowUser(token, username)),
+    onMutate: async (variables) => {
+      const { next, username } = variables;
+      qc.setQueryData<{
+        items: {
+          username: string;
+          name?: string;
+          isMe?: boolean;
+          isFollowedByMe?: boolean;
+          followsMe?: boolean;
+        }[];
+      }>(['posts', postId, 'likes', 1, 20], (prev) => {
+        const items = Array.isArray(prev?.items) ? prev!.items.slice(0) : [];
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].username === username) {
+            items[i] = { ...items[i], isFollowedByMe: next };
+            break;
+          }
+        }
+        return { items };
+      });
+      qc.setQueryData<Me>(['me'], (prev) => {
+        if (!prev) return prev as Me | undefined;
+        const cur = prev.stats?.following ?? undefined;
+        const updated =
+          typeof cur === 'number'
+            ? Math.max(0, cur + (next ? 1 : -1))
+            : undefined;
+        return updated === undefined
+          ? prev
+          : {
+              ...prev,
+              stats: {
+                ...(prev.stats ?? {
+                  post: 0,
+                  followers: 0,
+                  following: 0,
+                  likes: 0,
+                }),
+                following: updated,
+              },
+            };
+      });
+      qc.setQueryData<Me>(['me', 'header'], (prev) => {
+        if (!prev) return prev as Me | undefined;
+        const cur = prev.stats?.following ?? undefined;
+        const updated =
+          typeof cur === 'number'
+            ? Math.max(0, cur + (next ? 1 : -1))
+            : undefined;
+        return updated === undefined
+          ? prev
+          : {
+              ...prev,
+              stats: {
+                ...(prev.stats ?? {
+                  post: 0,
+                  followers: 0,
+                  following: 0,
+                  likes: 0,
+                }),
+                following: updated,
+              },
+            };
+      });
+    },
     onSuccess: (_, variables) => {
       qc.setQueryData<{
         items: {
@@ -55,6 +121,13 @@ export default function LikesDrawer({
         }
         return { items };
       });
+      qc.invalidateQueries({ queryKey: ['me'] });
+      qc.invalidateQueries({ queryKey: ['me', 'header'] });
+    },
+    onError: () => {
+      qc.invalidateQueries({ queryKey: ['me'] });
+      qc.invalidateQueries({ queryKey: ['me', 'header'] });
+      qc.invalidateQueries({ queryKey: ['posts', postId, 'likes', 1, 20] });
     },
   });
   const list = Array.isArray(likes.data?.items) ? likes.data!.items : [];
