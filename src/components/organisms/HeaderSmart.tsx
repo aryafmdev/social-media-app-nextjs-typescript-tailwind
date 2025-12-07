@@ -20,6 +20,8 @@ export default function HeaderSmart() {
     return () => mq.removeEventListener('change', update);
   }, []);
 
+  if (typeof window === 'undefined') return null;
+
   const hasToken = !!token;
 
   const variant = (() => {
