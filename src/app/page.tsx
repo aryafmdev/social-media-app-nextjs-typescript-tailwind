@@ -1,7 +1,7 @@
 'use client';
 import HeaderSmart from '../components/organisms/HeaderSmart';
 import AlertBanner from '../components/organisms/AlertBanner';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import MenuBar from '../components/molecules/MenuBar';
 import PostCard from '../components/organisms/PostCard';
 import { useSelector } from 'react-redux';
@@ -9,7 +9,6 @@ import { RootState } from '../store';
 import { useQuery } from '@tanstack/react-query';
 import { getFeed } from '../lib/api/feed';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const token = useSelector((s: RootState) => s.auth.token);
@@ -25,23 +24,27 @@ export default function Home() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    if (searchParams.get('posted') === '1') {
-      const timerStart = setTimeout(() => {
-        setShowBanner(true);
+  if (searchParams.get('posted') === '1') {
+    // tampilkan banner lewat timer agar tidak dianggap synchronous setState
+    const timerShow = setTimeout(() => {
+      setShowBanner(true);
 
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete('posted');
-        router.replace(`/?${params.toString()}`);
-      }, 0);
+      // hilangkan setelah 1 detik
+      const timerHide = setTimeout(() => {
+        setShowBanner(false);
+      }, 1000);
 
-      const timerHide = setTimeout(() => setShowBanner(false), 2000);
+      // hapus query param supaya tidak muncul lagi
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('posted');
+      router.replace(`/?${params.toString()}`);
 
-      return () => {
-        clearTimeout(timerStart);
-        clearTimeout(timerHide);
-      };
-    }
-  }, [searchParams, router]);
+      return () => clearTimeout(timerHide);
+    }, 0);
+
+    return () => clearTimeout(timerShow);
+  }
+}, [searchParams, router]);
 
   return (
     <main className='min-h-screen bg-black'>

@@ -22,8 +22,8 @@ export default function ProfileHeader({
       <div className='flex items-center gap-md'>
         <Avatar size={64} src={avatarUrl} />
         <div className='flex flex-col'>
-          <span className='text-neutral-25 font-semibold'>{name}</span>
-          <span className='text-neutral-400'>{username}</span>
+          <span className='text-neutral-25 font-semibold' suppressHydrationWarning>{name}</span>
+          <span className='text-neutral-400' suppressHydrationWarning>{username}</span>
         </div>
       </div>
       <div className='mt-2xl flex items-center gap-xl'>

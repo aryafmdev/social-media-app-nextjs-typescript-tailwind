@@ -40,11 +40,7 @@ export default function ProfilePage() {
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  const savedAuth = typeof window !== 'undefined' ? loadAuth() : undefined;
-  const effectiveToken = useMemo(
-    () => token ?? savedAuth?.token ?? null,
-    [token, savedAuth?.token]
-  );
+  const effectiveToken = useMemo(() => token ?? null, [token]);
 
   const me = useQuery({
     queryKey: ['me'],
@@ -61,24 +57,20 @@ export default function ProfilePage() {
     queryFn: () => getMySaved(effectiveToken as string, 1, 20),
     enabled: !!effectiveToken,
   });
-  const hasPosts = (
-    (hasPostsOverride ?? (me.data?.stats?.post ?? 0) > 0) ||
-    ((posts.data?.items?.length ?? 0) > 0)
-  ) as boolean;
+  const hasPosts = ((hasPostsOverride ?? (me.data?.stats?.post ?? 0) > 0) ||
+    (posts.data?.items?.length ?? 0) > 0) as boolean;
 
   return (
     <main className='min-h-screen bg-neutral-950'>
       <Header variant={isMdUp ? 'after-login' : 'mobile-profile'} />
       <ProfileTemplate>
         <ProfileHeader
-          name={[reduxUser?.name, me.data?.name, savedAuth?.user?.name].find(
+          name={[reduxUser?.name, me.data?.name].find(
             (v) => typeof v === 'string' && v.trim().length > 0
           )}
-          username={[
-            reduxUser?.username,
-            me.data?.username,
-            savedAuth?.user?.username,
-          ].find((v) => typeof v === 'string' && v.trim().length > 0)}
+          username={[reduxUser?.username, me.data?.username].find(
+            (v) => typeof v === 'string' && v.trim().length > 0
+          )}
           avatarUrl={me.data?.avatarUrl}
           stats={me.data?.stats}
           onEdit={() => router.push('/profile/edit')}

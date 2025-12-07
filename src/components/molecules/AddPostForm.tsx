@@ -13,15 +13,34 @@ import AlertBanner from '../organisms/AlertBanner';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 
-const fileListSchema = z.custom<FileList>(
-  (v) => typeof FileList !== 'undefined' && v instanceof FileList,
-  { message: 'Invalid file list' }
-);
+const fileListSchema = z.custom<FileList>((v) => v instanceof FileList).superRefine((v, ctx) => {
+  if (!v || v.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Image is required or make sure file max 5MB',
+    });
+    return;
+  }
+
+  const file = v[0];
+
+  if (file.size > 5 * 1024 * 1024) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Image too large (max 5MB)',
+    });
+  }
+
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Only PNG/JPG/WEBP allowed',
+    });
+  }
+});
 
 const schema = z.object({
-  image: fileListSchema.refine((v) => v && v.length > 0, {
-    message: 'Image is required',
-  }),
+  image: fileListSchema,
   caption: z.string().optional(),
 });
 
@@ -31,7 +50,7 @@ export default function AddPostForm() {
   const token = useSelector((s: RootState) => s.auth.token) as string;
   const router = useRouter();
   const qc = useQueryClient();
-  const form = useForm<FormValues>({ resolver: zodResolver(schema) });
+  const form = useForm<FormValues>({ resolver: zodResolver(schema), mode: 'onChange'});
 
   const watchedImage = useWatch({ control: form.control, name: 'image' });
   const previewFile = useMemo(() => {
@@ -39,9 +58,7 @@ export default function AddPostForm() {
     if (!f) return undefined;
     const file = f as File;
     if (
-      !['image/png', 'image/jpeg', 'image/webp'].includes(file.type) ||
-      file.size > 5 * 1024 * 1024
-    ) {
+      !['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
       return undefined;
     }
     return file;
@@ -60,7 +77,7 @@ export default function AddPostForm() {
   const mut = useMutation({
     mutationFn: async (v: FormValues) => {
       const file = v.image?.[0] as File;
-      if (!file) throw new Error('Image is required');
+      if (!file) throw new Error('Image is required or make sure file max 5MB');
       if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
         throw new Error('Only PNG/JPG/WEBP allowed');
       }
@@ -115,13 +132,18 @@ export default function AddPostForm() {
                 <Icon icon='lucide:cloud-upload' className='size-5' />
               </button>
               <div>
-              <span
-                className='text-primary-200 text-sm font-bold cursor-pointer'
-                onClick={() => document.getElementById('image-input')?.click()}
-              >
-                Click to upload
-              </span>
-              <span className='text-neutral-600 text-sm'> or drag and drop</span>
+                <span
+                  className='text-primary-200 text-sm font-bold cursor-pointer'
+                  onClick={() =>
+                    document.getElementById('image-input')?.click()
+                  }
+                >
+                  Click to upload
+                </span>
+                <span className='text-neutral-600 text-sm'>
+                  {' '}
+                  or drag and drop
+                </span>
               </div>
               <span className='text-neutral-600 text-sm'>
                 PNG or JPG (max. 5mb)
@@ -140,13 +162,25 @@ export default function AddPostForm() {
               />
               <div className='mt-xl flex gap-xl'>
                 <label className='w-full rounded-lg px-3xl h-[40px] bg-neutral-900 border border-neutral-900 text-neutral-25 font-medium text-sm flex items-center justify-center gap-md cursor-pointer'>
-                  <Icon icon='fluent:arrow-upload-24-filled' className='size-5' />
+                  <Icon
+                    icon='fluent:arrow-upload-24-filled'
+                    className='size-5'
+                  />
                   Change Image
                   <input
                     id='image-input'
                     type='file'
                     accept='image/png,image/jpeg,image/webp'
-                    {...form.register('image')}
+                    {...form.register('image', {
+                      onChange: (e) => {
+                        const files = (e.target as HTMLInputElement).files;
+                        if (files) {
+                          form.setValue('image', files, {
+                            shouldValidate: true,
+                          });
+                        }
+                      },
+                    })}
                     className='hidden'
                   />
                 </label>
@@ -166,14 +200,21 @@ export default function AddPostForm() {
               id='image-input'
               type='file'
               accept='image/png,image/jpeg,image/webp'
-              {...form.register('image')}
+              {...form.register('image', {
+                onChange: (e) => {
+                  const files = (e.target as HTMLInputElement).files;
+                  if (files) {
+                    form.setValue('image', files, { shouldValidate: true });
+                  }
+                },
+              })}
               className='hidden'
             />
           )}
         </div>
         {form.formState.errors.image && (
           <span className='text-[#B41759] text-sm'>
-            {form.formState.errors.image.message?.toString()}
+            {form.formState.errors.image.message}
           </span>
         )}
       </div>
@@ -198,9 +239,19 @@ export default function AddPostForm() {
       <Button
         type='submit'
         disabled={mut.isPending}
-        className='w-full rounded-full h-[40px] bg-primary-300 hover:bg-primary-200 text-neutral-25 font-bold text-sm cursor-pointer'
+        className='w-full rounded-full h-[40px] bg-primary-300 hover:bg-primary-200 text-neutral-25 font-bold text-sm cursor-pointer flex items-center justify-center gap-sm'
       >
-        Share
+        {mut.isPending ? (
+          <>
+            <Icon
+              icon='line-md:loading-twotone-loop'
+              className='size-5 animate-spin'
+            />
+            Posting...
+          </>
+        ) : (
+          'Share'
+        )}
       </Button>
       {(mut.isError || !!serverErrorLabel) && (
         <AlertBanner
