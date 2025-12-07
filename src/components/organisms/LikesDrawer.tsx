@@ -18,6 +18,9 @@ export default function LikesDrawer({
   postId: string;
 }) {
   const token = useSelector((s: RootState) => s.auth.token) as string;
+  const myUsername = useSelector((s: RootState) => s.auth.user?.username) as
+    | string
+    | undefined;
   const qc = useQueryClient();
   const likes = useQuery({
     queryKey: ['posts', postId, 'likes', 1, 20],
@@ -69,7 +72,7 @@ export default function LikesDrawer({
         <div className='px-xl py-md flex items-center justify-between'>
           <span className='text-neutral-25 font-bold text-md'>Likes</span>
           <button
-            className='size-6 flex items-center justify-center text-neutral-300 text-2xl hover:text-neutral-25 cursor-pointer'
+            className='size-6 flex items-center justify-center text-neutral-300 text-xl hover:text-neutral-25 cursor-pointer'
             onClick={onCloseAction}
             aria-label='Close'
           >
@@ -91,7 +94,9 @@ export default function LikesDrawer({
               {list.map((lk) => {
                 const displayName = (lk.name ?? lk.username ?? '').trim();
                 const avatar = (lk as { avatarUrl?: string }).avatarUrl;
-                const isMe = lk.isMe === true;
+                const isMe =
+                  lk.isMe === true ||
+                  (!!myUsername && lk.username === myUsername);
                 const isFollowed = lk.isFollowedByMe === true;
                 return (
                   <div
