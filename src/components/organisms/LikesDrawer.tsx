@@ -117,7 +117,7 @@ export default function LikesDrawer({
                     {!isMe &&
                       (isFollowed ? (
                         <button
-                          className='rounded-full border border-neutral-700 text-neutral-25 px-3xl h-[32px] flex items-center gap-sm'
+                          className='rounded-full border border-neutral-700 text-neutral-25 text-sm font-bold px-3xl h-[40px] flex items-center gap-sm cursor-pointer'
                           onClick={() =>
                             followMut.mutate({
                               username: lk.username,
@@ -126,12 +126,12 @@ export default function LikesDrawer({
                           }
                           aria-label={`unfollow-${lk.username}`}
                         >
-                          <Icon icon='lucide:check' className='size-4' />
+                          <Icon icon='gg:check-o' className='size-5' />
                           <span>Following</span>
                         </button>
                       ) : (
                         <button
-                          className='rounded-full bg-primary-200 text-neutral-25 px-3xl h-[32px] font-bold'
+                          className='rounded-full bg-primary-300 text-neutral-25 px-3xl h-[40px] text-sm font-bold cursor-pointer'
                           onClick={() =>
                             followMut.mutate({
                               username: lk.username,
