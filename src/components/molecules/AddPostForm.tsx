@@ -13,34 +13,41 @@ import AlertBanner from '../organisms/AlertBanner';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 
-const fileListSchema = z.custom<FileList>((v) => v instanceof FileList).superRefine((v, ctx) => {
-  if (!v || v.length === 0) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Image is required or make sure file max 5MB',
-    });
-    return;
-  }
+const allowedTypes = [
+  'image/png',
+  'image/jpeg',
+  'image/jpg',
+  'image/pjpeg',
+  'image/webp',
+];
 
-  const file = v[0];
-
-  if (file.size > 5 * 1024 * 1024) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Image too large (max 5MB)',
-    });
-  }
-
-  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Only PNG/JPG/WEBP allowed',
-    });
-  }
-});
+const fileSchema = z
+  .custom<File>((v) => v instanceof File)
+  .superRefine((v, ctx) => {
+    if (!v || !(v as File).size) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Image is required or make sure file max 5MB',
+      });
+      return;
+    }
+    const file = v as File;
+    if (file.size > 5 * 1024 * 1024) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Image too large (max 5MB)',
+      });
+    }
+    if (!allowedTypes.includes(file.type)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Only PNG/JPG/WEBP allowed',
+      });
+    }
+  });
 
 const schema = z.object({
-  image: fileListSchema,
+  image: fileSchema,
   caption: z.string().optional(),
 });
 
@@ -50,17 +57,17 @@ export default function AddPostForm() {
   const token = useSelector((s: RootState) => s.auth.token) as string;
   const router = useRouter();
   const qc = useQueryClient();
-  const form = useForm<FormValues>({ resolver: zodResolver(schema), mode: 'onChange'});
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    mode: 'onChange',
+  });
 
   const watchedImage = useWatch({ control: form.control, name: 'image' });
   const previewFile = useMemo(() => {
-    const f = watchedImage && watchedImage.length > 0 ? watchedImage[0] : null;
-    if (!f) return undefined;
-    const file = f as File;
-    if (
-      !['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-      return undefined;
-    }
+    const file = watchedImage as File | undefined;
+    if (!file) return undefined;
+    if (!allowedTypes.includes(file.type)) return undefined;
+    if (file.size > 5 * 1024 * 1024) return undefined;
     return file;
   }, [watchedImage]);
   const previewDataUrl = useMemo(
@@ -76,9 +83,9 @@ export default function AddPostForm() {
   const [serverErrorLabel, setServerErrorLabel] = useState<string | null>(null);
   const mut = useMutation({
     mutationFn: async (v: FormValues) => {
-      const file = v.image?.[0] as File;
+      const file = v.image as File;
       if (!file) throw new Error('Image is required or make sure file max 5MB');
-      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      if (!allowedTypes.includes(file.type)) {
         throw new Error('Only PNG/JPG/WEBP allowed');
       }
       if (file.size > 5 * 1024 * 1024) {
@@ -109,10 +116,31 @@ export default function AddPostForm() {
           onDrop={(e) => {
             e.preventDefault();
             const files = e.dataTransfer.files;
-            const dt = new DataTransfer();
-            for (let i = 0; i < files.length && i < 1; i++)
-              dt.items.add(files[i]);
-            form.setValue('image', dt.files, { shouldValidate: true });
+            const f =
+              files && files.length > 0 ? (files[0] as File) : undefined;
+            if (!f) return;
+            if (!allowedTypes.includes(f.type)) {
+              form.setError('image', {
+                type: 'custom',
+                message: 'Only PNG/JPG/WEBP allowed',
+              });
+              form.resetField('image');
+              return;
+            }
+            if (f.size > 5 * 1024 * 1024) {
+              form.setError('image', {
+                type: 'custom',
+                message: 'Image too large (max 5MB)',
+              });
+              form.resetField('image');
+              return;
+            }
+            form.clearErrors('image');
+            form.setValue('image', f as File, {
+              shouldValidate: true,
+              shouldDirty: true,
+              shouldTouch: true,
+            });
           }}
           className={`rounded-xl border ${
             form.formState.errors.image
@@ -146,7 +174,7 @@ export default function AddPostForm() {
                 </span>
               </div>
               <span className='text-neutral-600 text-sm'>
-                PNG or JPG (max. 5mb)
+                PNG/JPG/WEBP (max. 5MB)
               </span>
             </>
           )}
@@ -161,28 +189,15 @@ export default function AddPostForm() {
                 unoptimized
               />
               <div className='mt-xl flex gap-xl'>
-                <label className='w-full rounded-lg px-3xl h-[40px] bg-neutral-900 border border-neutral-900 text-neutral-25 font-medium text-sm flex items-center justify-center gap-md cursor-pointer'>
+                <label
+                  htmlFor='image-input'
+                  className='w-full rounded-lg px-3xl h-[40px] bg-neutral-900 border border-neutral-900 text-neutral-25 font-medium text-sm flex items-center justify-center gap-md cursor-pointer'
+                >
                   <Icon
                     icon='fluent:arrow-upload-24-filled'
                     className='size-5'
                   />
                   Change Image
-                  <input
-                    id='image-input'
-                    type='file'
-                    accept='image/png,image/jpeg,image/webp'
-                    {...form.register('image', {
-                      onChange: (e) => {
-                        const files = (e.target as HTMLInputElement).files;
-                        if (files) {
-                          form.setValue('image', files, {
-                            shouldValidate: true,
-                          });
-                        }
-                      },
-                    })}
-                    className='hidden'
-                  />
                 </label>
                 <button
                   type='button'
@@ -195,22 +210,42 @@ export default function AddPostForm() {
               </div>
             </div>
           )}
-          {!previewDataUrl && (
-            <input
-              id='image-input'
-              type='file'
-              accept='image/png,image/jpeg,image/webp'
-              {...form.register('image', {
-                onChange: (e) => {
-                  const files = (e.target as HTMLInputElement).files;
-                  if (files) {
-                    form.setValue('image', files, { shouldValidate: true });
-                  }
-                },
-              })}
-              className='hidden'
-            />
-          )}
+          <input
+            id='image-input'
+            type='file'
+            accept='.jpg,.jpeg,.png,.webp,image/*'
+            {...form.register('image', {
+              onChange: (e) => {
+                const files = (e.target as HTMLInputElement).files;
+                const f =
+                  files && files.length > 0 ? (files[0] as File) : undefined;
+                if (!f) return;
+                if (!allowedTypes.includes(f.type)) {
+                  form.setError('image', {
+                    type: 'custom',
+                    message: 'Only PNG/JPG/WEBP allowed',
+                  });
+                  form.resetField('image');
+                  return;
+                }
+                if (f.size > 5 * 1024 * 1024) {
+                  form.setError('image', {
+                    type: 'custom',
+                    message: 'Image too large (max 5MB)',
+                  });
+                  form.resetField('image');
+                  return;
+                }
+                form.clearErrors('image');
+                form.setValue('image', f as File, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                  shouldTouch: true,
+                });
+              },
+            })}
+            className='hidden'
+          />
         </div>
         {form.formState.errors.image && (
           <span className='text-[#B41759] text-sm'>

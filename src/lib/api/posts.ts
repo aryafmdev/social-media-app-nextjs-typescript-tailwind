@@ -156,7 +156,7 @@ export async function createPost(
   input: { image: File; caption?: string }
 ): Promise<Post> {
   const form = new FormData();
-  form.append('image', input.image);
+  form.append('image', input.image, input.image.name);
   if (input.caption) form.append('caption', input.caption);
   const res = await fetch('/api/posts', {
     method: 'POST',
