@@ -1,19 +1,17 @@
 import { ProfileTab } from '../molecules/ProfileTabs';
-import type { MyPost } from '../../lib/api/me';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
-export default function ProfileContent({
-  tab,
-  hasPosts,
-  items,
-}: {
+export default function ProfileContent(props: {
   tab: ProfileTab;
   hasPosts: boolean;
-  items?: MyPost[];
+  items?: { id: string; imageUrl?: string }[];
+  onUpload?: () => void;
 }) {
   const router = useRouter();
+  const { tab, hasPosts, items } = props;
 
-  if (!hasPosts) {
+  if (tab === 'gallery' && !hasPosts) {
     return (
       <div className='mt-2xl text-center'>
         <h2 className='font-display text-md font-bold text-neutral-25'>
@@ -26,7 +24,7 @@ export default function ProfileContent({
         <div className='mt-2xl flex justify-center'>
           <button
             onClick={() => router.push('/posts/new')}
-            className="rounded-full bg-primary-300 text-md font-bold text-neutral-25 px-5xl py-md"
+            className='rounded-full bg-primary-300 text-md font-bold text-neutral-25 px-5xl py-md'
           >
             Upload My First Post
           </button>
@@ -35,18 +33,51 @@ export default function ProfileContent({
     );
   }
 
-  const placeholder: { id: string }[] = Array.from({ length: 9 }).map(
-    (_, i) => ({ id: String(i) })
-  );
-  const list: { id: string }[] =
-    items && items.length > 0 ? items.map((p) => ({ id: p.id })) : placeholder;
-  const grid = (
+  const list = (items ?? [])
+    .filter(
+      (p) => typeof p.imageUrl === 'string' && p.imageUrl!.trim().length > 0
+    )
+    .map((p) => ({ id: p.id, imageUrl: p.imageUrl as string }));
+
+  if (tab !== 'gallery') {
+    return (
+      <div className='mt-2xl grid grid-cols-3 gap-xs'>
+        {list.map((item) => (
+          <div
+            key={item.id}
+            className='rounded-xs overflow-hidden h-[110px] relative'
+          >
+            <Image
+              src={item.imageUrl}
+              alt={`${tab} image`}
+              fill
+              sizes='(min-width: 768px) 33vw, 100vw'
+              className='object-cover'
+              unoptimized
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
     <div className='mt-2xl grid grid-cols-3 gap-xs'>
       {list.map((item) => (
-        <div key={item.id} className='bg-neutral-800 rounded-xs h-[110px]' />
+        <div
+          key={item.id}
+          className='rounded-xs overflow-hidden h-[110px] relative'
+        >
+          <Image
+            src={item.imageUrl}
+            alt={`${tab} image`}
+            fill
+            sizes='(min-width: 768px) 33vw, 100vw'
+            className='object-cover'
+            unoptimized
+          />
+        </div>
       ))}
     </div>
   );
-
-  return tab === 'gallery' ? grid : grid;
 }

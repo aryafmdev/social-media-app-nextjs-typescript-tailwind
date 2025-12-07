@@ -61,8 +61,10 @@ export default function ProfilePage() {
     queryFn: () => getMySaved(effectiveToken as string, 1, 20),
     enabled: !!effectiveToken,
   });
-  const hasPosts = (hasPostsOverride ??
-    (me.data?.stats?.post ?? 0) > 0) as boolean;
+  const hasPosts = (
+    (hasPostsOverride ?? (me.data?.stats?.post ?? 0) > 0) ||
+    ((posts.data?.items?.length ?? 0) > 0)
+  ) as boolean;
 
   return (
     <main className='min-h-screen bg-neutral-950'>

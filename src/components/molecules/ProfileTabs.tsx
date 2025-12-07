@@ -14,14 +14,14 @@ export default function ProfileTabs({
       <div className='flex justify-around items-center gap-3xl text-neutral-25'>
         <button
           onClick={() => onChange('gallery')}
-          className={`flex items-center gap-sm ${active === 'gallery' ? 'font-bold' : 'text-neutral-400'}`}
+          className={`flex items-center gap-sm cursor-pointer ${active === 'gallery' ? 'font-bold' : 'text-neutral-400'}`}
         >
           <Icon icon='mingcute:grid-2-fill' className='text-xl' />
           <span>Gallery</span>
         </button>
         <button
           onClick={() => onChange('saved')}
-          className={`flex items-center gap-sm ${active === 'saved' ? 'font-bold' : 'text-neutral-400'}`}
+          className={`flex items-center gap-sm cursor-pointer ${active === 'saved' ? 'font-bold' : 'text-neutral-400'}`}
         >
           <Icon
             icon={

@@ -38,10 +38,13 @@ export default function PostActions({
   });
   return (
     <div className='flex items-center justify-between'>
-      <div className='flex items-center gap-xl text-3xl'>
-        <button onClick={() => likeMut.mutate()} className='text-neutral-25'>
+      <div className='flex items-center gap-xl text-3xl cursor-pointer'>
+        <button
+          onClick={() => likeMut.mutate()}
+          className='text-neutral-25 cursor-pointer'
+        >
           <ActionCount
-            icon={liked ? 'line-md:heart-filled' : 'line-md:heart'}
+            icon={liked ? 'mdi:heart' : 'mdi:heart-outline'}
             count={likesCount}
           />
         </button>
@@ -52,7 +55,7 @@ export default function PostActions({
         <ActionCount icon='lucide:send' count={0} />
       </div>
       <button
-        className='text-neutral-25 text-3xl'
+        className='text-neutral-25 text-3xl cursor-pointer'
         onClick={() => saveMut.mutate()}
       >
         <Icon

@@ -39,6 +39,8 @@ const nextConfig = {
       // Auth/OAuth avatar
       { protocol: 'https', hostname: 'lh3.googleusercontent.com', pathname: '/**' },   // Google
       { protocol: 'https', hostname: 'img.clerk.com', pathname: '/**' },               // Clerk
+      { protocol: 'https', hostname: 'storage.googleapis.com', pathname: '/**' },      // Google Cloud Storage
+      { protocol: 'https', hostname: '*.run.app', pathname: '/**' },                   // Google Cloud Run
     ],
   },
   typescript: { ignoreBuildErrors: true },

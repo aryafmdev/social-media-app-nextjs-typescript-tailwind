@@ -106,7 +106,17 @@ function parseMe(raw: Record<string, unknown>): Me {
   ]);
 
   const stats: Me['stats'] | undefined = (() => {
-    const post = findFirstNumberDeep(root, ['post', 'posts']);
+    const post = findFirstNumberDeep(root, [
+      'post',
+      'posts',
+      'postCount',
+      'postsCount',
+      'images',
+      'imageCount',
+      'photos',
+      'photoCount',
+      'totalPosts',
+    ]);
     const followers = findFirstNumberDeep(root, ['followers']);
     const following = findFirstNumberDeep(root, ['following']);
     const likes = findFirstNumberDeep(root, ['likes']);
@@ -197,11 +207,78 @@ export async function getMyPosts(
   token: string,
   page = 1,
   limit = 20
-): Promise<{ items: MyPost[]; page: number; total: number }> {
+): Promise<{ items: MyPost[]; page?: number; total?: number }> {
   const res = await fetch(`/api/me/posts?page=${page}&limit=${limit}`, {
     headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
   });
   if (!res.ok) throw new Error('Failed to fetch my posts');
-  return res.json();
+  const json = (await res.json().catch(() => ({}))) as
+    | Record<string, unknown>
+    | { items: unknown };
+  const root =
+    (typeof json === 'object' &&
+      json &&
+      (json as Record<string, unknown>)['data']) ||
+    json;
+  const itemsUnknown =
+    (root && (root as Record<string, unknown>)['items']) ||
+    (root && (root as Record<string, unknown>)['posts']) ||
+    root;
+  const arr: unknown[] = Array.isArray(itemsUnknown)
+    ? itemsUnknown
+    : Array.isArray((itemsUnknown as Record<string, unknown>)?.['items'])
+      ? (((itemsUnknown as Record<string, unknown>)['items'] as unknown[]) ??
+        [])
+      : [];
+  const items: MyPost[] = arr
+    .filter((it) => it && typeof it === 'object')
+    .map((raw) => {
+      const r = raw as Record<string, unknown>;
+      const idRaw = (r['id'] ?? r['postId']) as unknown;
+      const id = typeof idRaw === 'string' ? idRaw : String(idRaw ?? '');
+      const imageUrlCandidate = (r['imageUrl'] ??
+        r['image_url'] ??
+        r['image'] ??
+        r['photo'] ??
+        r['url']) as unknown;
+      const imageUrl =
+        typeof imageUrlCandidate === 'string'
+          ? imageUrlCandidate
+          : findFirstStringDeep(r, [
+              'imageUrl',
+              'image_url',
+              'image',
+              'photo',
+              'url',
+              'path',
+            ]);
+      const createdAtCandidate = (r['createdAt'] ??
+        r['created_at'] ??
+        r['timestamp'] ??
+        r['postedAt']) as unknown;
+      const createdAt =
+        typeof createdAtCandidate === 'string' ? createdAtCandidate : undefined;
+      return { id, imageUrl, createdAt } as MyPost;
+    });
+  const pageNum = (() => {
+    const p = (root as Record<string, unknown>)?.['page'];
+    if (typeof p === 'number' && Number.isFinite(p)) return p;
+    if (typeof p === 'string') {
+      const n = Number(p);
+      if (!Number.isNaN(n)) return n;
+    }
+    return undefined;
+  })();
+  const totalNum = (() => {
+    const t = (root as Record<string, unknown>)?.['total'];
+    if (typeof t === 'number' && Number.isFinite(t)) return t;
+    if (typeof t === 'string') {
+      const n = Number(t);
+      if (!Number.isNaN(n)) return n;
+    }
+    return undefined;
+  })();
+  return { items, page: pageNum, total: totalNum };
 }
 import { loadAuth } from '../authStorage';
