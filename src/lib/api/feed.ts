@@ -50,7 +50,13 @@ function normalizePost(raw: Record<string, unknown>): Post {
   const saved =
     typeof savedCandidate === 'boolean' ? savedCandidate : undefined;
   const likesCount = toNumber(raw['likesCount'] ?? raw['likes']);
-  const commentsCount = toNumber(raw['commentsCount'] ?? raw['comments']);
+  const commentsCount = toNumber(
+    raw['commentsCount'] ??
+      raw['comments'] ??
+      (raw as Record<string, unknown>)['commentCount'] ??
+      (raw as Record<string, unknown>)['totalComments'] ??
+      (raw as Record<string, unknown>)['comments_total']
+  );
   const createdAtCandidate = (raw['createdAt'] ??
     raw['created_at'] ??
     raw['timestamp'] ??

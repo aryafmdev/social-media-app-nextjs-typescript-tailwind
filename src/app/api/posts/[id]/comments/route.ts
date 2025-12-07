@@ -13,6 +13,9 @@ export async function GET(
     `${publicApiBaseUrl}/api/posts/${id}/comments?page=${page}&limit=${limit}`,
     {
       cache: 'no-store',
+      headers: {
+        Authorization: req.headers.get('authorization') || '',
+      },
     }
   );
   const data = await res.text();
@@ -29,7 +32,7 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const json = await req.json();
+  const json = await req.json().catch(() => ({}));
   const res = await fetch(`${publicApiBaseUrl}/api/posts/${id}/comments`, {
     method: 'POST',
     headers: {

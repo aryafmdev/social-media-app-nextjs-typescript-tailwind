@@ -1,6 +1,6 @@
 'use client';
 import { Icon } from '@iconify/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { getComments, addComment } from '../../lib/api/comments';
 import type { Comment } from '../../lib/api/comments';
+import type { Post } from '../../lib/api/posts';
 
 dayjs.extend(relativeTime);
 
@@ -20,7 +21,7 @@ export default function CommentsDrawer({ open, onCloseAction, postId }: Props) {
   const qc = useQueryClient();
   const comments = useQuery({
     queryKey: ['posts', postId, 'comments', 1, 20],
-    queryFn: () => getComments(postId, 1, 20),
+    queryFn: () => getComments(token ?? null, postId, 1, 20),
     enabled: open,
   });
   const [text, setText] = useState('');
@@ -36,11 +37,65 @@ export default function CommentsDrawer({ open, onCloseAction, postId }: Props) {
           return { items };
         }
       );
+
+      qc.setQueriesData<{ items: Post[] }>({ queryKey: ['feed'] }, (old) => {
+        if (!old || !Array.isArray(old.items)) return old;
+        const items = old.items.map((p) =>
+          p.id === postId
+            ? { ...p, commentsCount: (p.commentsCount ?? 0) + 1 }
+            : p
+        );
+        return { ...old, items };
+      });
+
+      qc.setQueriesData<{ items: Post[] }>(
+        { queryKey: ['feed', 1, 10] },
+        (old) => {
+          if (!old || !Array.isArray(old.items)) return old;
+          const items = old.items.map((p) =>
+            p.id === postId
+              ? { ...p, commentsCount: (p.commentsCount ?? 0) + 1 }
+              : p
+          );
+          return { ...old, items };
+        }
+      );
+
+      qc.setQueryData<Post>(['post', postId], (prev) =>
+        prev ? { ...prev, commentsCount: (prev.commentsCount ?? 0) + 1 } : prev
+      );
+
+      qc.invalidateQueries({ queryKey: ['posts', postId, 'comments'] });
+
       setText('');
       setEmojiOpen(false);
     },
   });
   const list = comments.data?.items ?? [];
+  useEffect(() => {
+    if (!open) return;
+    const count = list.length;
+    qc.setQueriesData<{ items: Post[] }>({ queryKey: ['feed'] }, (old) => {
+      if (!old || !Array.isArray(old.items)) return old;
+      const items = old.items.map((p) =>
+        p.id === postId ? { ...p, commentsCount: count } : p
+      );
+      return { ...old, items };
+    });
+    qc.setQueriesData<{ items: Post[] }>(
+      { queryKey: ['feed', 1, 10] },
+      (old) => {
+        if (!old || !Array.isArray(old.items)) return old;
+        const items = old.items.map((p) =>
+          p.id === postId ? { ...p, commentsCount: count } : p
+        );
+        return { ...old, items };
+      }
+    );
+    qc.setQueryData<Post>(['post', postId], (prev) =>
+      prev ? { ...prev, commentsCount: count } : prev
+    );
+  }, [open, postId, list.length, qc]);
   const content = open ? (
     <div className='fixed inset-0 z-50'>
       <div
@@ -121,12 +176,22 @@ export default function CommentsDrawer({ open, onCloseAction, postId }: Props) {
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => {
+                if (
+                  e.key === 'Enter' &&
+                  text.trim().length > 0 &&
+                  !mut.isPending
+                ) {
+                  e.preventDefault();
+                  mut.mutate();
+                }
+              }}
               placeholder='Add Comment'
               className='flex-1 bg-transparent text-neutral-25 text-sm font-medium placeholder:text-neutral-500 outline-none'
             />
             <button
               type='button'
-              className={`text-sm font-bold ${text.trim().length > 0 ? 'text-primary-200' : 'text-neutral-600'}`}
+              className={`text-sm font-bold cursor-pointer ${text.trim().length > 0 ? 'text-primary-200' : 'text-neutral-600'}`}
               onClick={() => mut.mutate()}
               disabled={mut.isPending || text.trim().length === 0}
             >

@@ -20,7 +20,7 @@ export default function PostDetailPage() {
   const token = useSelector((s: RootState) => s.auth.token);
   const qc = useQueryClient();
   const post = useQuery({ queryKey: ["post", id], queryFn: () => getPost(id as string), enabled: !!id });
-  const comments = useQuery({ queryKey: ["post", id, "comments", 1, 10], queryFn: () => getComments(id as string, 1, 10), enabled: !!id });
+  const comments = useQuery({ queryKey: ["post", id, "comments", 1, 10], queryFn: () => getComments(token ?? null, id as string, 1, 10), enabled: !!id });
   const add = useMutation({ mutationFn: async (text: string) => addComment(token as string, id as string, text), onSuccess: () => qc.invalidateQueries({ queryKey: ["post", id, "comments", 1, 10] }) });
   const del = useMutation({ mutationFn: async (cid: string) => deleteComment(token as string, cid), onSuccess: () => qc.invalidateQueries({ queryKey: ["post", id, "comments", 1, 10] }) });
   return (
