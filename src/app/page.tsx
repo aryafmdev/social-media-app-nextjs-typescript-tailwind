@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { useQuery } from '@tanstack/react-query';
 import { getFeed } from '../lib/api/feed';
+import { getMySaved } from '../lib/api/saves';
 import { useEffect, useState, Suspense } from 'react';
 
 export default function Home() {
@@ -28,6 +29,11 @@ function HomeContent() {
   const feed = useQuery({
     queryKey: ['feed', 1, 10],
     queryFn: () => getFeed(token as string, 1, 10),
+    enabled: ready,
+  });
+  const mySaved = useQuery({
+    queryKey: ['me', 'saved', 1, 20],
+    queryFn: () => getMySaved(token as string, 1, 20),
     enabled: ready,
   });
 
@@ -61,9 +67,18 @@ function HomeContent() {
       )}
       {ready && feed.data?.items && feed.data.items.length > 0 && (
         <section className='mx-auto px-xl py-xl flex flex-col gap-4xl'>
-          {feed.data?.items?.map((p) => (
-            <PostCard key={p.id} variant='mobile' post={p} />
-          ))}
+          {feed.data?.items?.map((p) => {
+            const savedSet = new Set(
+              mySaved.data?.items?.map((it) => it.id) ?? []
+            );
+            const postWithSaved = {
+              ...p,
+              saved: p.saved ?? savedSet.has(p.id),
+            } as typeof p;
+            return (
+              <PostCard key={p.id} variant='mobile' post={postWithSaved} />
+            );
+          })}
         </section>
       )}
       {ready && feed.data?.items && feed.data.items.length === 0 && (
