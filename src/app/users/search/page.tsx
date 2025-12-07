@@ -1,5 +1,9 @@
 "use client";
-import HeaderSmart from "../../../components/organisms/HeaderSmart";
+import dynamic from "next/dynamic";
+const HeaderSmart = dynamic(
+  () => import("../../../components/organisms/HeaderSmart"),
+  { ssr: false }
+);
 import ProfileTemplate from "../../../components/templates/ProfileTemplate";
 import Input from "../../../components/atoms/Input";
 import { useState } from "react";
@@ -27,4 +31,3 @@ export default function UsersSearchPage() {
     </main>
   );
 }
-

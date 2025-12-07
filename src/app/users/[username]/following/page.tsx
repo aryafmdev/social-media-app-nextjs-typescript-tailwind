@@ -1,5 +1,9 @@
 "use client";
-import HeaderSmart from "../../../../components/organisms/HeaderSmart";
+import dynamic from "next/dynamic";
+const HeaderSmart = dynamic(
+  () => import("../../../../components/organisms/HeaderSmart"),
+  { ssr: false }
+);
 import ProfileTemplate from "../../../../components/templates/ProfileTemplate";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -23,4 +27,3 @@ export default function FollowingPage() {
     </main>
   );
 }
-

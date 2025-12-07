@@ -1,5 +1,9 @@
 'use client';
-import HeaderSmart from '../components/organisms/HeaderSmart';
+import dynamic from 'next/dynamic';
+const HeaderSmart = dynamic(
+  () => import('../components/organisms/HeaderSmart'),
+  { ssr: false }
+);
 import AlertBanner from '../components/organisms/AlertBanner';
 import { useSearchParams, useRouter } from 'next/navigation';
 import MenuBar from '../components/molecules/MenuBar';
