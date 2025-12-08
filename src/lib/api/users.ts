@@ -141,7 +141,9 @@ function normalizeUserPublic(raw: Record<string, unknown>): UserPublic {
     'is_followed_by_me',
   ]);
   const out = { username, name, avatarUrl, bio, stats } as UserPublic;
-  if (isFollowedByMe !== undefined) (out as UserPublic & { isFollowedByMe?: boolean }).isFollowedByMe = isFollowedByMe;
+  if (isFollowedByMe !== undefined)
+    (out as UserPublic & { isFollowedByMe?: boolean }).isFollowedByMe =
+      isFollowedByMe;
   return out;
 }
 
@@ -257,12 +259,30 @@ export async function getUserPosts(
 
 export async function getUserLikes(
   username: string,
-  page = 1,
-  limit = 20,
   token?: string
+): Promise<{ items: PublicPost[] }>;
+export async function getUserLikes(
+  username: string,
+  page?: number,
+  limit?: number,
+  token?: string
+): Promise<{ items: PublicPost[] }>;
+export async function getUserLikes(
+  username: string,
+  pageOrToken?: number | string,
+  limit?: number,
+  tokenMaybe?: string
 ): Promise<{ items: PublicPost[] }> {
+  const page = typeof pageOrToken === 'number' ? pageOrToken : 1;
+  const lim =
+    typeof pageOrToken === 'number'
+      ? typeof limit === 'number'
+        ? limit
+        : 200
+      : 200;
+  const token = typeof pageOrToken === 'string' ? pageOrToken : tokenMaybe;
   const res = await fetch(
-    `/api/users/${username}/likes?page=${page}&limit=${limit}`,
+    `/api/users/${username}/likes?page=${page}&limit=${lim}`,
     {
       cache: 'no-store',
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
@@ -354,6 +374,16 @@ export async function getUserLikes(
             undefined;
       return { id, imageUrl, caption };
     });
+  if (items.length === 0) {
+    try {
+      console.warn('getUserLikes: empty result', {
+        username,
+        page,
+        limit: lim,
+        raw: json,
+      });
+    } catch {}
+  }
   return { items };
 }
 

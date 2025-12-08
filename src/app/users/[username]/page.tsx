@@ -58,8 +58,8 @@ export default function PublicProfilePage() {
     placeholderData: (prev) => prev,
   });
   const likes = useQuery<{ items: PublicPost[] }>({
-    queryKey: ['user', username, 'likes', 1, 20, token ?? null],
-    queryFn: () => getUserLikes(username as string, 1, 20, token as string),
+    queryKey: ['user', username, 'likes', token ? 'auth' : 'anon'],
+    queryFn: () => getUserLikes(username as string, token as string),
     enabled: !!username && tab === 'saved',
     staleTime: 0,
     refetchOnMount: true,
@@ -71,8 +71,8 @@ export default function PublicProfilePage() {
     if (!username) return;
     if (tab === 'saved') {
       qc.prefetchQuery({
-        queryKey: ['user', username, 'likes', 1, 20, token ?? null],
-        queryFn: () => getUserLikes(username as string, 1, 20, token as string),
+        queryKey: ['user', username, 'likes', token ? 'auth' : 'anon'],
+        queryFn: () => getUserLikes(username as string, token as string),
       });
     } else {
       qc.prefetchQuery({

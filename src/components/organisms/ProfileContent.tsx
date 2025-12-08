@@ -41,6 +41,18 @@ export default function ProfileContent(props: {
     .map((p) => ({ id: p.id, imageUrl: p.imageUrl as string }));
 
   if (tab !== 'gallery') {
+    if (tab === 'saved' && list.length === 0) {
+      return (
+        <div className='mt-2xl text-center'>
+          <div className='text-neutral-25 font-bold text-md'>
+            No liked posts yet
+          </div>
+          <div className='text-neutral-400 text-sm'>
+            Explore and like posts to see them here
+          </div>
+        </div>
+      );
+    }
     return (
       <div className='mt-2xl grid grid-cols-3 gap-xs'>
         {list.map((item) => (
