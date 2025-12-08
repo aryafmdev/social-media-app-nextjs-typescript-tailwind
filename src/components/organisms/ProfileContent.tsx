@@ -24,7 +24,7 @@ export default function ProfileContent(props: {
         <div className='mt-2xl flex justify-center'>
           <button
             onClick={() => router.push('/posts/new')}
-            className='rounded-full bg-primary-300 text-md font-bold text-neutral-25 px-5xl py-md'
+            className='rounded-full bg-primary-300 text-md font-bold text-neutral-25 px-5xl py-md cursor-pointer'
           >
             Upload My First Post
           </button>

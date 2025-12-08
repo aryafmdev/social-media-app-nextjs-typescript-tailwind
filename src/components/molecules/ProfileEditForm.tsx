@@ -14,6 +14,7 @@ import Input from '../atoms/Input';
 import AlertBanner from '../organisms/AlertBanner';
 import { setAuth } from '../../store/authSlice';
 import { saveAuth, loadAuth } from '../../lib/authStorage';
+import { Icon } from '@iconify/react';
 
 const fileListSchema = z.custom<FileList>(
   (v) => typeof FileList !== 'undefined' && v instanceof FileList,
@@ -118,10 +119,7 @@ export default function ProfileEditForm({
           form.getValues().username ??
           saved?.user?.username,
         phone: updated?.phone ?? form.getValues().phone ?? saved?.user?.phone,
-        bio:
-          updated?.bio ??
-          form.getValues().bio ??
-          saved?.user?.bio,
+        bio: updated?.bio ?? form.getValues().bio ?? saved?.user?.bio,
       };
       dispatch(setAuth({ token, user: mergedUser }));
       saveAuth(token, mergedUser);
@@ -196,9 +194,19 @@ export default function ProfileEditForm({
       <Button
         type='submit'
         disabled={mutation.isPending}
-        className='w-full rounded-full h-[40px] bg-primary-300  hover:bg-primary-200 text-neutral-25 font-bold text-sm cursor-pointer'
+        className='w-full rounded-full h-[40px] bg-primary-300 hover:bg-primary-200 text-neutral-25 font-bold text-sm cursor-pointer flex items-center justify-center gap-sm'
       >
-        Save Changes
+        {mutation.isPending ? (
+          <>
+            <Icon
+              icon='line-md:loading-twotone-loop'
+              className='size-5 animate-spin'
+            />
+            Saving...
+          </>
+        ) : (
+          'Save Changes'
+        )}
       </Button>
       {(mutation.isError || !!serverErrorLabel) && (
         <AlertBanner
