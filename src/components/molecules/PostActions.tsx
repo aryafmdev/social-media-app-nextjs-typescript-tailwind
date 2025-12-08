@@ -148,7 +148,7 @@ export default function PostActions({
       ['post', postId],
       (prev) => (prev ? apply(prev) : prev)
     );
-  }, [qc, postId]);
+  }, [qc, postId, token, myUsername, liked, saved]);
   const likeMut = useMutation({
     mutationFn: async (nextLiked: boolean) =>
       nextLiked ? likePost(token, postId) : unlikePost(token, postId),
