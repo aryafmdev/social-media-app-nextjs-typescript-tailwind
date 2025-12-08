@@ -7,6 +7,7 @@ type Props = {
   avatarUrl?: string;
   stats?: { post: number; followers: number; following: number; likes: number };
   onEdit?: () => void;
+  followState?: { isFollowed: boolean; onToggle: (next: boolean) => void };
 };
 
 export default function ProfileHeader({
@@ -15,6 +16,7 @@ export default function ProfileHeader({
   avatarUrl,
   stats,
   onEdit,
+  followState,
 }: Props) {
   const display = (name ?? username ?? '').trim();
   const uname = (username ?? '').trim();
@@ -39,12 +41,33 @@ export default function ProfileHeader({
         </div>
       </div>
       <div className='mt-2xl flex items-center gap-xl'>
-        <button
-          onClick={onEdit}
-          className='rounded-full w-full border border-neutral-800 text-sm font-bold text-neutral-25 px-4xl py-md cursor-pointer hover:bg-neutral-800'
-        >
-          Edit Profile
-        </button>
+        {onEdit ? (
+          <button
+            onClick={onEdit}
+            className='rounded-full w-full border border-neutral-800 text-sm font-bold text-neutral-25 px-4xl py-md cursor-pointer hover:bg-neutral-800'
+          >
+            Edit Profile
+          </button>
+        ) : followState ? (
+          followState.isFollowed ? (
+            <button
+              className='rounded-full w-full border border-neutral-700 text-neutral-25 text-sm font-bold px-4xl py-md flex items-center justify-center gap-sm cursor-pointer'
+              onClick={() => followState.onToggle(false)}
+              aria-label='unfollow'
+            >
+              <Icon icon='gg:check-o' className='size-5' />
+              <span>Following</span>
+            </button>
+          ) : (
+            <button
+              className='rounded-full w-full bg-primary-300 text-neutral-25 px-4xl py-md text-sm font-bold cursor-pointer'
+              onClick={() => followState.onToggle(true)}
+              aria-label='follow'
+            >
+              Follow
+            </button>
+          )
+        ) : null}
         <button className='w-12 h-10 text-xl rounded-full border border-neutral-800 text-neutral-25 flex items-center justify-center cursor-pointer'>
           <Icon icon='lucide:send' />
         </button>

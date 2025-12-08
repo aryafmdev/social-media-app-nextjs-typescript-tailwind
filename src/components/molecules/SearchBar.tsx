@@ -83,8 +83,8 @@ export default function SearchBar({
           placeholder={placeholder}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              if (topSuggestion?.username)
-                router.push(`/users/${topSuggestion.username}`);
+              const uname = topSuggestion?.username || debounced;
+              if (uname) router.push(`/users/${uname}`);
             }
           }}
           className='flex-1 bg-transparent text-neutral-25 placeholder:text-neutral-500 outline-none'

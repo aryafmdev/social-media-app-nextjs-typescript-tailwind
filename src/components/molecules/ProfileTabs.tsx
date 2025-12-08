@@ -5,9 +5,15 @@ export type ProfileTab = 'gallery' | 'saved';
 export default function ProfileTabs({
   active,
   onChange,
+  secondLabel = 'Saved',
+  secondActiveIcon = 'gravity-ui:bookmark-fill',
+  secondInactiveIcon = 'gravity-ui:bookmark',
 }: {
   active: ProfileTab;
   onChange: (t: ProfileTab) => void;
+  secondLabel?: string;
+  secondActiveIcon?: string;
+  secondInactiveIcon?: string;
 }) {
   return (
     <div className='mt-2xl'>
@@ -24,14 +30,10 @@ export default function ProfileTabs({
           className={`flex items-center gap-sm cursor-pointer ${active === 'saved' ? 'font-bold' : 'text-neutral-400'}`}
         >
           <Icon
-            icon={
-              active === 'saved'
-                ? 'gravity-ui:bookmark-fill'
-                : 'gravity-ui:bookmark'
-            }
+            icon={active === 'saved' ? secondActiveIcon : secondInactiveIcon}
             className='text-xl'
           />
-          <span>Saved</span>
+          <span>{secondLabel}</span>
         </button>
       </div>
       <div className='mt-lg h-px bg-neutral-800' />

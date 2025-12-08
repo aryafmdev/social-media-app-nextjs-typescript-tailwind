@@ -7,11 +7,12 @@ export default function ProfileContent(props: {
   hasPosts: boolean;
   items?: { id: string; imageUrl?: string }[];
   onUpload?: () => void;
+  publicView?: boolean;
 }) {
   const router = useRouter();
-  const { tab, hasPosts, items } = props;
+  const { tab, hasPosts, items, publicView } = props;
 
-  if (tab === 'gallery' && !hasPosts) {
+  if (tab === 'gallery' && !hasPosts && !publicView) {
     return (
       <div className='mt-2xl text-center'>
         <h2 className='font-display text-md font-bold text-neutral-25'>
