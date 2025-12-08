@@ -139,88 +139,90 @@ export default function LikesDrawer({
         onClick={onCloseAction}
       />
       <div
-        className='absolute inset-x-0 bottom-0 bg-neutral-950 transition-all duration-300'
-        style={{ height: `${Math.min(33 + list.length * 4, 66)}vh` }}
+        className='absolute inset-x-0 bottom-0 transition-all duration-300'
+        style={{ height: '50vh' }}
       >
-        <div className='px-xl py-md flex items-center justify-between'>
-          <span className='text-neutral-25 font-bold text-md'>Likes</span>
-          <button
-            className='size-6 flex items-center justify-center text-neutral-300 text-xl hover:text-neutral-25 cursor-pointer'
-            onClick={onCloseAction}
-            aria-label='Close'
-          >
-            <Icon icon='lucide:x' />
-          </button>
-        </div>
-        <div className='px-xl pb-[88px] overflow-y-auto max-h-[calc(100%-120px)]'>
-          {list.length === 0 ? (
-            <div className='text-center mt-xl'>
-              <div className='text-neutral-25 font-bold text-md'>
-                No Likes yet
+        <div className='w-full max-w-[600px] mx-auto px-4 h-full relative bg-neutral-950 rounded-xl'>
+          <div className='py-md flex items-center justify-between'>
+            <span className='text-neutral-25 font-bold text-md'>Likes</span>
+            <button
+              className='size-6 flex items-center justify-center text-neutral-300 text-xl hover:text-neutral-25 cursor-pointer'
+              onClick={onCloseAction}
+              aria-label='Close'
+            >
+              <Icon icon='lucide:x' />
+            </button>
+          </div>
+          <div className='pb-[88px] overflow-y-auto max-h-[calc(100%-120px)]'>
+            {list.length === 0 ? (
+              <div className='text-center mt-xl'>
+                <div className='text-neutral-25 font-bold text-md'>
+                  No Likes yet
+                </div>
+                <div className='text-neutral-400 text-sm font-regular mt-md'>
+                  Be the first to like
+                </div>
               </div>
-              <div className='text-neutral-400 text-sm font-regular mt-md'>
-                Be the first to like
-              </div>
-            </div>
-          ) : (
-            <div className='flex flex-col gap-lg'>
-              {list.map((lk) => {
-                const displayName = (lk.name ?? lk.username ?? '').trim();
-                const avatar = (lk as { avatarUrl?: string }).avatarUrl;
-                const isMe =
-                  lk.isMe === true ||
-                  (!!myUsername && lk.username === myUsername);
-                const isFollowed = lk.isFollowedByMe === true;
-                return (
-                  <div
-                    key={lk.username}
-                    className='flex items-center justify-between'
-                  >
-                    <div className='flex items-center gap-md'>
-                      <Avatar src={avatar} />
-                      <div className='flex flex-col'>
-                        <span className='text-neutral-25 font-semibold'>
-                          {displayName || lk.username}
-                        </span>
-                        <span className='text-neutral-400 text-sm'>
-                          {lk.username}
-                        </span>
+            ) : (
+              <div className='flex flex-col gap-lg'>
+                {list.map((lk) => {
+                  const displayName = (lk.name ?? lk.username ?? '').trim();
+                  const avatar = (lk as { avatarUrl?: string }).avatarUrl;
+                  const isMe =
+                    lk.isMe === true ||
+                    (!!myUsername && lk.username === myUsername);
+                  const isFollowed = lk.isFollowedByMe === true;
+                  return (
+                    <div
+                      key={lk.username}
+                      className='flex items-center justify-between'
+                    >
+                      <div className='flex items-center gap-md'>
+                        <Avatar src={avatar} />
+                        <div className='flex flex-col'>
+                          <span className='text-neutral-25 font-semibold'>
+                            {displayName || lk.username}
+                          </span>
+                          <span className='text-neutral-400 text-sm'>
+                            {lk.username}
+                          </span>
+                        </div>
                       </div>
+                      {!isMe &&
+                        (isFollowed ? (
+                          <button
+                            className='rounded-full border border-neutral-700 text-neutral-25 text-sm font-bold px-3xl h-[40px] flex items-center gap-sm cursor-pointer'
+                            onClick={() =>
+                              followMut.mutate({
+                                username: lk.username,
+                                next: false,
+                              })
+                            }
+                            aria-label={`unfollow-${lk.username}`}
+                          >
+                            <Icon icon='gg:check-o' className='size-5' />
+                            <span>Following</span>
+                          </button>
+                        ) : (
+                          <button
+                            className='rounded-full bg-primary-300 text-neutral-25 px-3xl h-[40px] text-sm font-bold cursor-pointer'
+                            onClick={() =>
+                              followMut.mutate({
+                                username: lk.username,
+                                next: true,
+                              })
+                            }
+                            aria-label={`follow-${lk.username}`}
+                          >
+                            Follow
+                          </button>
+                        ))}
                     </div>
-                    {!isMe &&
-                      (isFollowed ? (
-                        <button
-                          className='rounded-full border border-neutral-700 text-neutral-25 text-sm font-bold px-3xl h-[40px] flex items-center gap-sm cursor-pointer'
-                          onClick={() =>
-                            followMut.mutate({
-                              username: lk.username,
-                              next: false,
-                            })
-                          }
-                          aria-label={`unfollow-${lk.username}`}
-                        >
-                          <Icon icon='gg:check-o' className='size-5' />
-                          <span>Following</span>
-                        </button>
-                      ) : (
-                        <button
-                          className='rounded-full bg-primary-300 text-neutral-25 px-3xl h-[40px] text-sm font-bold cursor-pointer'
-                          onClick={() =>
-                            followMut.mutate({
-                              username: lk.username,
-                              next: true,
-                            })
-                          }
-                          aria-label={`follow-${lk.username}`}
-                        >
-                          Follow
-                        </button>
-                      ))}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
