@@ -1,5 +1,6 @@
 import Avatar from '../atoms/Avatar';
 import { Icon } from '@iconify/react';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   name?: string;
@@ -18,6 +19,7 @@ export default function ProfileHeader({
   onEdit,
   followState,
 }: Props) {
+  const router = useRouter();
   const display = (name ?? username ?? '').trim();
   const uname = (username ?? '').trim();
   return (
@@ -85,7 +87,11 @@ export default function ProfileHeader({
             Post
           </div>
         </div>
-        <div>
+        <div
+          className='cursor-pointer'
+          onClick={() => router.push('/profile/followers')}
+          aria-label='go-followers'
+        >
           <div className='text-xl font-display border-r border-neutral-800 pr-lg'>
             {stats?.followers ?? 0}
           </div>
@@ -93,7 +99,11 @@ export default function ProfileHeader({
             Followers
           </div>
         </div>
-        <div>
+        <div
+          className='cursor-pointer'
+          onClick={() => router.push('/profile/following')}
+          aria-label='go-following'
+        >
           <div className='text-xl font-display border-r border-neutral-800 pr-lg'>
             {stats?.following ?? 0}
           </div>
@@ -101,7 +111,11 @@ export default function ProfileHeader({
             Following
           </div>
         </div>
-        <div>
+        <div
+          className='cursor-pointer'
+          onClick={() => router.push('/profile/likes')}
+          aria-label='go-likes'
+        >
           <div className='text-xl font-display pr-lg'>{stats?.likes ?? 0}</div>
           <div className='text-sm text-neutral-400 pr-lg'>Likes</div>
         </div>

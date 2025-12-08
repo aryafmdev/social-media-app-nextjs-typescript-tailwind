@@ -157,5 +157,40 @@ export async function getMyLiked(
     cache: 'no-store',
   });
   if (!res.ok) throw new Error('Failed to get my liked posts');
-  return (await res.json()) as { items: Post[] };
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown> | { items: unknown };
+  const root = (typeof json === 'object' && json && (json as Record<string, unknown>)['data']) || json;
+  const direct =
+    (root && (root as Record<string, unknown>)['items']) ||
+    (root && (root as Record<string, unknown>)['posts']) ||
+    root;
+  let arr: unknown[] = Array.isArray(direct)
+    ? (direct as unknown[])
+    : Array.isArray((direct as Record<string, unknown>)?.['items'])
+      ? (((direct as Record<string, unknown>)['items'] as unknown[]) ?? [])
+      : [];
+  if (arr.length === 0) {
+    arr = findFirstArrayDeep(root, ['items', 'posts', 'list']) ?? [];
+  }
+  const items: Post[] = arr
+    .filter((it) => it && typeof it === 'object')
+    .map((it) => {
+      const o = it as Record<string, unknown>;
+      const idRaw = (o['id'] ?? o['postId']) as unknown;
+      const id = typeof idRaw === 'string' ? idRaw : String(idRaw ?? '');
+      const imageUrlCandidate =
+        findFirstStringDeep(o, ['imageUrl', 'image_url', 'image', 'photo', 'url']);
+      const captionCandidate = findFirstStringDeep(o, ['caption', 'text', 'description']);
+      const authorCandidate = (o['author'] ?? o['user'] ?? o['owner']) as unknown;
+      const authorRoot = authorCandidate && typeof authorCandidate === 'object' ? (authorCandidate as Record<string, unknown>) : o;
+      const authorUsername = findFirstStringDeep(authorRoot, ['username', 'user_name', 'handle']);
+      const authorName = findFirstStringDeep(authorRoot, ['name', 'fullName', 'displayName']);
+      const authorAvatar = findFirstStringDeep(authorRoot, ['avatarUrl','avatar_url','image','photo','profilePicture','profile_picture']);
+      const author = (() => {
+        if (authorUsername || authorName || authorAvatar)
+          return { username: (authorUsername ?? authorName ?? '').trim(), name: authorName, avatarUrl: authorAvatar } as Post['author'];
+        return undefined;
+      })();
+      return { id, imageUrl: imageUrlCandidate, caption: captionCandidate, author } as Post;
+    });
+  return { items };
 }
