@@ -56,20 +56,23 @@ export default function ProfileContent(props: {
     return (
       <div className='mt-2xl grid grid-cols-3 gap-xs'>
         {list.map((item) => (
-          <div
+          <button
             key={item.id}
-            className='rounded-xs overflow-hidden h-[110px] relative cursor-pointer'
+            type='button'
+            className='rounded-xs overflow-hidden cursor-pointer'
             onClick={() => router.push(`/posts/${item.id}`)}
+            aria-label={`open-${tab}-${item.id}`}
           >
             <Image
               src={item.imageUrl}
               alt={`${tab} image`}
-              fill
+              width={600}
+              height={600}
               sizes='(min-width: 768px) 33vw, 100vw'
-              className='object-cover cursor-pointer'
+              className='w-full h-auto'
               unoptimized
             />
-          </div>
+          </button>
         ))}
       </div>
     );
@@ -78,20 +81,23 @@ export default function ProfileContent(props: {
   return (
     <div className='mt-2xl grid grid-cols-3 gap-xs'>
       {list.map((item) => (
-        <div
+        <button
           key={item.id}
-          className='rounded-xs overflow-hidden h-[110px] relative cursor-pointer'
+          type='button'
+          className='rounded-xs overflow-hidden cursor-pointer'
           onClick={() => router.push(`/posts/${item.id}`)}
+          aria-label={`open-${tab}-${item.id}`}
         >
           <Image
             src={item.imageUrl}
             alt={`${tab} image`}
-            fill
+            width={600}
+            height={600}
             sizes='(min-width: 768px) 33vw, 100vw'
-            className='object-cover cursor-pointer'
+            className='w-full h-auto'
             unoptimized
           />
-        </div>
+        </button>
       ))}
     </div>
   );
