@@ -30,6 +30,12 @@ export default function PostActions({
     | undefined;
   const [openComments, setOpenComments] = useState(false);
   const [openLikes, setOpenLikes] = useState(false);
+  const [clientLiked, setClientLiked] = useState<boolean | undefined>(
+    undefined
+  );
+  const [clientSaved, setClientSaved] = useState<boolean | undefined>(
+    undefined
+  );
   useEffect(() => {
     const lkKey = `sociality_like_${postId}`;
     const svKey = `sociality_saved_${postId}`;
@@ -156,6 +162,7 @@ export default function PostActions({
       const k = `sociality_like_${postId}`;
       if (typeof window !== 'undefined')
         window.localStorage.setItem(k, nextLiked ? '1' : '0');
+      setClientLiked(nextLiked);
       const apply = (p: import('../../lib/api/posts').Post) => {
         const base = p.likesCount ?? 0;
         const updated = nextLiked ? base + 1 : base - 1;
@@ -222,6 +229,7 @@ export default function PostActions({
       const k = `sociality_saved_${postId}`;
       if (typeof window !== 'undefined')
         window.localStorage.setItem(k, nextSaved ? '1' : '0');
+      setClientSaved(nextSaved);
       const apply = (p: import('../../lib/api/posts').Post) => ({
         ...p,
         saved: nextSaved,
@@ -310,7 +318,13 @@ export default function PostActions({
       ? true
       : undefined;
     return (
-      localVal ?? fromFeed ?? fromDetail ?? fromSavedList ?? saved ?? false
+      localVal ??
+      clientSaved ??
+      fromFeed ??
+      fromDetail ??
+      fromSavedList ??
+      saved ??
+      false
     );
   })();
   const likedState = (() => {
@@ -338,7 +352,13 @@ export default function PostActions({
       ? true
       : undefined;
     return (
-      localVal ?? fromFeed ?? fromDetail ?? fromLikesList ?? liked ?? false
+      localVal ??
+      clientLiked ??
+      fromFeed ??
+      fromDetail ??
+      fromLikesList ??
+      liked ??
+      false
     );
   })();
   const likesCountState = (() => {
