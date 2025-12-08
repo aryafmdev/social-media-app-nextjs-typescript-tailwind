@@ -46,6 +46,23 @@ export default function Header({
     queryKey: ['me', 'header'],
     queryFn: () => getMe(effectiveToken as string),
     enabled: !!effectiveToken,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 10,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    placeholderData: (prev) => prev,
+    initialData: savedAuth?.user
+      ? {
+          name: savedAuth.user.name ?? '',
+          username: savedAuth.user.username ?? '',
+          email: savedAuth.user.email,
+          phone: savedAuth.user.phone,
+          bio: savedAuth.user.bio,
+          avatarUrl: undefined,
+          stats: undefined,
+        }
+      : undefined,
   });
   const displayName =
     [
@@ -177,7 +194,7 @@ export default function Header({
             className='text-neutral-25 font-medium text-md'
             suppressHydrationWarning
           >
-            {displayName || 'User'}
+            {displayName}
           </span>
           <IconButton
             onClick={() => {
@@ -236,7 +253,7 @@ export default function Header({
             className='text-neutral-25 font-bold text-md'
             suppressHydrationWarning
           >
-            {displayName || '-'}
+            {displayName}
           </span>
         </div>
         <div className='flex items-center gap-md'>

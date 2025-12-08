@@ -16,14 +16,22 @@ export default function ProfileHeader({
   stats,
   onEdit,
 }: Props) {
+  const display = (name ?? username ?? '').trim();
+  const uname = (username ?? '').trim();
   return (
     <div className='w-full bg-black'>
-    
       <div className='flex items-center gap-md'>
         <Avatar size={64} src={avatarUrl} />
         <div className='flex flex-col'>
-          <span className='text-neutral-25 font-semibold' suppressHydrationWarning>{name}</span>
-          <span className='text-neutral-400' suppressHydrationWarning>{username}</span>
+          <span
+            className='text-neutral-25 font-semibold'
+            suppressHydrationWarning
+          >
+            {display}
+          </span>
+          <span className='text-neutral-400' suppressHydrationWarning>
+            {uname}
+          </span>
         </div>
       </div>
       <div className='mt-2xl flex items-center gap-xl'>
@@ -38,21 +46,33 @@ export default function ProfileHeader({
         </button>
       </div>
       <p className='mt-xl text-neutral-200 text-sm font-regular'>
-        Creating unforgettable moments with my favorite person!📸✨ Let`s cherish
-        every second together!
+        Creating unforgettable moments with my favorite person!📸✨ Let`s
+        cherish every second together!
       </p>
       <div className='mt-xl grid grid-cols-4 gap-xl text-center text-neutral-25'>
         <div>
-          <div className='text-xl font-display border-r border-neutral-800'>{stats?.post ?? 0}</div>
-          <div className='text-sm text-neutral-400 border-r border-neutral-800'>Post</div>
+          <div className='text-xl font-display border-r border-neutral-800'>
+            {stats?.post ?? 0}
+          </div>
+          <div className='text-sm text-neutral-400 border-r border-neutral-800'>
+            Post
+          </div>
         </div>
         <div>
-          <div className='text-xl font-display border-r border-neutral-800 pr-lg'>{stats?.followers ?? 0}</div>
-          <div className='text-sm text-neutral-400 border-r border-neutral-800 pr-lg'>Followers</div>
+          <div className='text-xl font-display border-r border-neutral-800 pr-lg'>
+            {stats?.followers ?? 0}
+          </div>
+          <div className='text-sm text-neutral-400 border-r border-neutral-800 pr-lg'>
+            Followers
+          </div>
         </div>
         <div>
-          <div className='text-xl font-display border-r border-neutral-800 pr-lg'>{stats?.following ?? 0}</div>
-          <div className='text-sm text-neutral-400 border-r border-neutral-800 pr-lg'>Following</div>
+          <div className='text-xl font-display border-r border-neutral-800 pr-lg'>
+            {stats?.following ?? 0}
+          </div>
+          <div className='text-sm text-neutral-400 border-r border-neutral-800 pr-lg'>
+            Following
+          </div>
         </div>
         <div>
           <div className='text-xl font-display pr-lg'>{stats?.likes ?? 0}</div>

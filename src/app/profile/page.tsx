@@ -1,8 +1,11 @@
 'use client';
 import { Suspense, useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useSelector } from 'react-redux';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import Header from '../../components/organisms/Header';
+const HeaderNoSSR = dynamic(() => import('../../components/organisms/Header'), {
+  ssr: false,
+});
 import ProfileTemplate from '../../components/templates/ProfileTemplate';
 import ProfileHeader from '../../components/organisms/ProfileHeader';
 import ProfileTabs, {
@@ -118,12 +121,17 @@ function ProfilePageContent() {
 
   return (
     <main className='min-h-screen bg-neutral-950'>
-      <Header variant={isMdUp ? 'after-login' : 'mobile-profile'} />
+      <HeaderNoSSR variant={isMdUp ? 'after-login' : 'mobile-profile'} />
       <ProfileTemplate>
         <ProfileHeader
-          name={[reduxUser?.name, me.data?.name, savedAuth?.user?.name].find(
-            (v) => typeof v === 'string' && v.trim().length > 0
-          )}
+          name={[
+            reduxUser?.name,
+            me.data?.name,
+            savedAuth?.user?.name,
+            reduxUser?.username,
+            me.data?.username,
+            savedAuth?.user?.username,
+          ].find((v) => typeof v === 'string' && v.trim().length > 0)}
           username={[
             reduxUser?.username,
             me.data?.username,
