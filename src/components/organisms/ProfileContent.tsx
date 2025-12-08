@@ -58,14 +58,15 @@ export default function ProfileContent(props: {
         {list.map((item) => (
           <div
             key={item.id}
-            className='rounded-xs overflow-hidden h-[110px] relative'
+            className='rounded-xs overflow-hidden h-[110px] relative cursor-pointer'
+            onClick={() => router.push(`/posts/${item.id}`)}
           >
             <Image
               src={item.imageUrl}
               alt={`${tab} image`}
               fill
               sizes='(min-width: 768px) 33vw, 100vw'
-              className='object-cover'
+              className='object-cover cursor-pointer'
               unoptimized
             />
           </div>
@@ -79,14 +80,15 @@ export default function ProfileContent(props: {
       {list.map((item) => (
         <div
           key={item.id}
-          className='rounded-xs overflow-hidden h-[110px] relative'
+          className='rounded-xs overflow-hidden h-[110px] relative cursor-pointer'
+          onClick={() => router.push(`/posts/${item.id}`)}
         >
           <Image
             src={item.imageUrl}
             alt={`${tab} image`}
             fill
             sizes='(min-width: 768px) 33vw, 100vw'
-            className='object-cover'
+            className='object-cover cursor-pointer'
             unoptimized
           />
         </div>

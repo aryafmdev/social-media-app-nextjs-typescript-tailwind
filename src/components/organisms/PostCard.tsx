@@ -3,6 +3,7 @@ import PostActions from '../molecules/PostActions';
 import type { Post } from '../../lib/api/posts';
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function PostCard({
   variant = 'mobile',
@@ -11,10 +12,12 @@ export default function PostCard({
   variant?: 'mobile' | 'md';
   post: Post;
 }) {
+  const router = useRouter();
   const imgClass =
     variant === 'md'
       ? 'w-[clamp(361px,calc(361px + (239 * (100vw - 393px) / 1047)),600px)] h-[clamp(361px,calc(361px + (239 * (100vw - 393px) / 1047)),600px)]'
       : 'size-[361px]';
+  const isDetail = variant === 'md';
 
   const [expanded, setExpanded] = useState(false);
   const authorDisplayName =
@@ -37,12 +40,16 @@ export default function PostCard({
           alt='post'
           width={600}
           height={600}
-          className={`rounded-xl object-cover ${imgClass}`}
+          className={`rounded-xl object-cover ${imgClass} ${isDetail ? '' : 'cursor-pointer'}`}
           style={{ width: '100%', height: 'auto' }}
           sizes='(min-width: 768px) 600px, 100vw'
+          onClick={isDetail ? undefined : () => router.push(`/posts/${post.id}`)}
         />
       ) : (
-        <div className={`w-full rounded-xl bg-neutral-800 ${imgClass}`} />
+        <div
+          className={`w-full rounded-xl bg-neutral-800 ${imgClass} ${isDetail ? '' : 'cursor-pointer'}`}
+          onClick={isDetail ? undefined : () => router.push(`/posts/${post.id}`)}
+        />
       )}
       <div className='mt-2xl'>
         <PostActions
