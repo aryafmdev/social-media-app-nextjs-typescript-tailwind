@@ -189,7 +189,14 @@ export default function Header({
           <IconButton>
             <Icon icon='lucide:search' className='md:hidden cursor-pointer' />
           </IconButton>
-          <Avatar src={avatarSrc} />
+          <button
+            type='button'
+            onClick={() => router.push('/profile')}
+            aria-label='go-profile'
+            className='cursor-pointer'
+          >
+            <Avatar src={avatarSrc} />
+          </button>
           <span
             className='text-neutral-25 font-medium text-md'
             suppressHydrationWarning
@@ -221,7 +228,14 @@ export default function Header({
           <IconButton onClick={onToggleSearchAction}>
             <Icon icon='lucide:search' className='md:hidden cursor-pointer' />
           </IconButton>
-          <Avatar src={avatarSrc} />
+          <button
+            type='button'
+            onClick={() => router.push('/profile')}
+            aria-label='go-profile'
+            className='cursor-pointer'
+          >
+            <Avatar src={avatarSrc} />
+          </button>
           <IconButton
             onClick={() => {
               clearAuthStorage();
@@ -257,7 +271,14 @@ export default function Header({
           </span>
         </div>
         <div className='flex items-center gap-md'>
-          <Avatar src={avatarSrc} />
+          <button
+            type='button'
+            onClick={() => router.push('/profile')}
+            aria-label='go-profile'
+            className='cursor-pointer'
+          >
+            <Avatar src={avatarSrc} />
+          </button>
           <IconButton
             onClick={() => {
               clearAuthStorage();
@@ -290,7 +311,14 @@ export default function Header({
           </span>
         </div>
         <div className='flex items-center gap-md'>
-          <Avatar src={avatarSrc} />
+          <button
+            type='button'
+            onClick={() => router.push('/profile')}
+            aria-label='go-profile'
+            className='cursor-pointer'
+          >
+            <Avatar src={avatarSrc} />
+          </button>
           <IconButton
             onClick={() => {
               clearAuthStorage();
