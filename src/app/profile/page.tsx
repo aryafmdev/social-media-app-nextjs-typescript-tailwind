@@ -50,22 +50,55 @@ function ProfilePageContent() {
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  const effectiveToken = useMemo(() => token ?? null, [token]);
+  const savedAuth = typeof window !== 'undefined' ? loadAuth() : undefined;
+  const effectiveToken = useMemo(
+    () => token ?? savedAuth?.token ?? null,
+    [token, savedAuth?.token]
+  );
 
   const me = useQuery({
     queryKey: ['me'],
     queryFn: () => getMe(effectiveToken as string),
     enabled: !!effectiveToken,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 10,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    placeholderData: (prev) => prev,
+    initialData: savedAuth?.user
+      ? {
+          name: savedAuth.user.name ?? '',
+          username: savedAuth.user.username ?? '',
+          email: savedAuth.user.email,
+          phone: savedAuth.user.phone,
+          bio: savedAuth.user.bio,
+          avatarUrl: undefined,
+          stats: undefined,
+        }
+      : undefined,
   });
   const posts = useQuery({
     queryKey: ['me', 'posts', 1, 20],
     queryFn: () => getMyPosts(effectiveToken as string, 1, 20),
     enabled: !!effectiveToken,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 10,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    placeholderData: (prev) => prev,
   });
   const saved = useQuery({
     queryKey: ['me', 'saved', 1, 20],
     queryFn: () => getMySaved(effectiveToken as string, 1, 20),
     enabled: !!effectiveToken,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 10,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    placeholderData: (prev) => prev,
   });
   const updatedFlag = sp.get('updated') === '1';
   useEffect(() => {
@@ -88,12 +121,14 @@ function ProfilePageContent() {
       <Header variant={isMdUp ? 'after-login' : 'mobile-profile'} />
       <ProfileTemplate>
         <ProfileHeader
-          name={[reduxUser?.name, me.data?.name].find(
+          name={[reduxUser?.name, me.data?.name, savedAuth?.user?.name].find(
             (v) => typeof v === 'string' && v.trim().length > 0
           )}
-          username={[reduxUser?.username, me.data?.username].find(
-            (v) => typeof v === 'string' && v.trim().length > 0
-          )}
+          username={[
+            reduxUser?.username,
+            me.data?.username,
+            savedAuth?.user?.username,
+          ].find((v) => typeof v === 'string' && v.trim().length > 0)}
           avatarUrl={me.data?.avatarUrl}
           stats={me.data?.stats}
           onEdit={() => router.push('/profile/edit')}
