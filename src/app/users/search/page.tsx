@@ -11,7 +11,7 @@ export default function SearchUsersPage() {
   return (
     <main className='min-h-screen bg-black'>
       <HeaderSmart />
-      <div className='px-xl py-xl'>
+      <div className='w-full max-w-[600px] mx-auto px-4 py-xl'>
         <SearchBar placeholder='Search users' />
       </div>
       <div className='fixed inset-x-0 bottom-10 flex justify-center'>

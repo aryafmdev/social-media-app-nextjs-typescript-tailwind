@@ -18,7 +18,7 @@ export default function SearchPreviewPage() {
   return (
     <main className='min-h-screen bg-black'>
       <HeaderSmart />
-      <div className='px-xl py-xl'>
+      <div className='w-full max-w-[600px] mx-auto px-4 py-xl'>
         <div className='flex flex-col gap-sm'>
           {items.map((u, i) => (
             <div

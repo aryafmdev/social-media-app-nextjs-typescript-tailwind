@@ -95,48 +95,50 @@ function HomeContent() {
   return (
     <main className='min-h-screen bg-black'>
       <HeaderSmart />
-      {showBanner && (
-        <section className='mx-auto px-xl py-md'>
-          <AlertBanner variant='success' label='Success Post' />
-        </section>
-      )}
-      {ready && items.length > 0 && (
-        <section className='mx-auto px-xl py-xl flex flex-col gap-4xl'>
-          {items.map((p) => (
-            <PostCard key={p.id} variant='mobile' post={p} />
-          ))}
-          <div ref={sentinelRef} />
-          {feed.isFetchingNextPage && (
-            <div className='text-center text-neutral-400'>Loading...</div>
+      <div className='w-full max-w-[600px] mx-auto px-4'>
+        {showBanner && (
+          <section className='py-md'>
+            <AlertBanner variant='success' label='Success Post' />
+          </section>
+        )}
+        {ready && items.length > 0 && (
+          <section className='py-xl flex flex-col gap-4xl'>
+            {items.map((p) => (
+              <PostCard key={p.id} variant='mobile' post={p} />
+            ))}
+            <div ref={sentinelRef} />
+            {feed.isFetchingNextPage && (
+              <div className='text-center text-neutral-400'>Loading...</div>
+            )}
+          </section>
+        )}
+        {ready &&
+          feed.isSuccess &&
+          me.isSuccess &&
+          items.length === 0 &&
+          (me.data?.stats?.following ?? 0) === 0 && (
+            <section className='py-xl'>
+              <div className='rounded-2xl bg-neutral-900 border border-neutral-800 p-3xl text-center'>
+                <p className='text-neutral-300'>
+                  Belum follow siapapun. Cari dan follow untuk lihat feed.
+                </p>
+              </div>
+            </section>
           )}
-        </section>
-      )}
-      {ready &&
-        feed.isSuccess &&
-        me.isSuccess &&
-        items.length === 0 &&
-        (me.data?.stats?.following ?? 0) === 0 && (
-          <section className='mx-auto px-xl py-xl'>
-            <div className='rounded-2xl bg-neutral-900 border border-neutral-800 p-3xl text-center'>
-              <p className='text-neutral-300'>
-                Belum follow siapapun. Cari dan follow untuk lihat feed.
-              </p>
-            </div>
-          </section>
-        )}
-      {ready &&
-        feed.isSuccess &&
-        me.isSuccess &&
-        items.length === 0 &&
-        (me.data?.stats?.following ?? 0) > 0 && (
-          <section className='mx-auto px-xl py-xl'>
-            <div className='rounded-2xl bg-neutral-900 border border-neutral-800 p-3xl text-center'>
-              <p className='text-neutral-300'>
-                Belum ada post. Ayo buat posting pertamamu!
-              </p>
-            </div>
-          </section>
-        )}
+        {ready &&
+          feed.isSuccess &&
+          me.isSuccess &&
+          items.length === 0 &&
+          (me.data?.stats?.following ?? 0) > 0 && (
+            <section className='py-xl'>
+              <div className='rounded-2xl bg-neutral-900 border border-neutral-800 p-3xl text-center'>
+                <p className='text-neutral-300'>
+                  Belum ada post. Ayo buat posting pertamamu!
+                </p>
+              </div>
+            </section>
+          )}
+      </div>
       <div className='fixed inset-x-0 bottom-10 flex justify-center'>
         <MenuBar />
       </div>
