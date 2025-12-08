@@ -1,4 +1,5 @@
 import Avatar from '../atoms/Avatar';
+import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -15,6 +16,7 @@ export default function PostHeader({
   avatarUrl?: string;
   createdAt?: string;
 }) {
+  const router = useRouter();
   const displayName =
     (name && name.trim()) || (username && username.trim()) || 'Username';
   const timeLabel = (() => {
@@ -24,7 +26,17 @@ export default function PostHeader({
   })();
   return (
     <div className='flex items-center gap-md'>
-      <Avatar src={avatarUrl} />
+      <button
+        type='button'
+        onClick={() => {
+          const uname = (username ?? '').trim();
+          if (uname) router.push(`/users/${uname}`);
+        }}
+        aria-label='go-user-profile'
+        className='cursor-pointer'
+      >
+        <Avatar src={avatarUrl} />
+      </button>
       <div className='flex flex-col'>
         <span className='text-neutral-25 font-semibold'>{displayName}</span>
         <span className='text-neutral-400 text-sm'>{timeLabel}</span>
