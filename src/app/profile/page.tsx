@@ -7,7 +7,10 @@ const HeaderNoSSR = dynamic(() => import('../../components/organisms/Header'), {
   ssr: false,
 });
 import ProfileTemplate from '../../components/templates/ProfileTemplate';
-import ProfileHeader from '../../components/organisms/ProfileHeader';
+const ProfileHeaderNoSSR = dynamic(
+  () => import('../../components/organisms/ProfileHeader'),
+  { ssr: false }
+);
 import ProfileTabs, {
   ProfileTab,
 } from '../../components/molecules/ProfileTabs';
@@ -123,7 +126,7 @@ function ProfilePageContent() {
     <main className='min-h-screen bg-neutral-950'>
       <HeaderNoSSR variant={isMdUp ? 'after-login' : 'mobile-profile'} />
       <ProfileTemplate>
-        <ProfileHeader
+        <ProfileHeaderNoSSR
           name={[
             reduxUser?.name,
             me.data?.name,
