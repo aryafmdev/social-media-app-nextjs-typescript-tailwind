@@ -1,11 +1,11 @@
 export async function followUser(token: string, username: string): Promise<{ following: boolean }> {
-  const res = await fetch(`/api/users/${username}/follow`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+  const res = await fetch(`/api/follow/${username}`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
   if (!res.ok) throw new Error('Failed to follow');
   return { following: true };
 }
 
 export async function unfollowUser(token: string, username: string): Promise<{ following: boolean }> {
-  const res = await fetch(`/api/users/${username}/follow`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+  const res = await fetch(`/api/follow/${username}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
   if (!res.ok) throw new Error('Failed to unfollow');
   return { following: false };
 }
@@ -35,4 +35,3 @@ export async function getMyFollowing(token: string, page = 1, limit = 20): Promi
   if (!res.ok) throw new Error('Failed to get my following');
   return (await res.json()) as { items: { username: string; name?: string }[] };
 }
-

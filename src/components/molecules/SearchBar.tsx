@@ -70,8 +70,6 @@ export default function SearchBar({
     return scored.sort((a, b) => b.s - a.s).map((it) => it.u);
   }, [res.data?.items, score]);
 
-  const topSuggestion = ranked.length > 0 ? ranked[0] : undefined;
-
   return (
     <div className='relative flex items-center w-full h-6xl px-lg gap-md'>
       <div className='flex items-center flex-1 h-full bg-neutral-900 rounded-full px-lg py-sm md:w-[clamp(363px,34vw,1309px)]'>
@@ -83,8 +81,7 @@ export default function SearchBar({
           placeholder={placeholder}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              const uname = topSuggestion?.username || debounced;
-              if (uname) router.push(`/users/${uname}`);
+              e.preventDefault();
             }
           }}
           className='flex-1 bg-transparent text-neutral-25 placeholder:text-neutral-500 outline-none'

@@ -4,6 +4,7 @@ export type UserPublic = {
   avatarUrl?: string;
   bio?: string;
   stats?: { post: number; followers: number; following: number; likes: number };
+  isFollowedByMe?: boolean;
 };
 export type UserSummary = {
   username: string;
@@ -58,6 +59,34 @@ function findFirstNumberDeep(
   return fallback;
 }
 
+function findFirstBooleanDeep(
+  src: unknown,
+  keys: string[]
+): boolean | undefined {
+  if (!src || typeof src !== 'object') return undefined;
+  const stack: Record<string, unknown>[] = [src as Record<string, unknown>];
+  const seen = new Set<object>();
+  while (stack.length) {
+    const cur = stack.pop()!;
+    if (seen.has(cur)) continue;
+    seen.add(cur);
+    for (const k of keys) {
+      const v = (cur as Record<string, unknown>)[k];
+      if (typeof v === 'boolean') return v;
+      if (typeof v === 'number') return v !== 0;
+      if (typeof v === 'string') {
+        const t = v.trim().toLowerCase();
+        if (t === 'true' || t === '1') return true;
+        if (t === 'false' || t === '0') return false;
+      }
+    }
+    for (const v of Object.values(cur)) {
+      if (v && typeof v === 'object') stack.push(v as Record<string, unknown>);
+    }
+  }
+  return undefined;
+}
+
 function normalizeUserPublic(raw: Record<string, unknown>): UserPublic {
   const username =
     findFirstStringDeep(raw, ['username', 'user_name', 'handle']) || '';
@@ -106,7 +135,14 @@ function normalizeUserPublic(raw: Record<string, unknown>): UserPublic {
       return { post, followers, following, likes };
     return undefined;
   })();
-  return { username, name, avatarUrl, bio, stats };
+  const isFollowedByMe = findFirstBooleanDeep(raw, [
+    'isFollowedByMe',
+    'followedByMe',
+    'is_followed_by_me',
+  ]);
+  const out = { username, name, avatarUrl, bio, stats } as UserPublic;
+  if (isFollowedByMe !== undefined) (out as UserPublic & { isFollowedByMe?: boolean }).isFollowedByMe = isFollowedByMe;
+  return out;
 }
 
 export async function getUser(username: string): Promise<UserPublic> {

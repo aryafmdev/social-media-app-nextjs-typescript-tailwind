@@ -30,6 +30,10 @@ import {
 
 export default function PublicProfilePage() {
   const { username } = useParams<{ username: string }>();
+  const lsKey = React.useMemo(
+    () => `sociality:follow:${String(username ?? '')}`,
+    [username]
+  );
   const token = useSelector((s: RootState) => s.auth.token);
   const router = useRouter();
   const qc = useQueryClient();
@@ -97,28 +101,99 @@ export default function PublicProfilePage() {
       !!myFollowing.data?.items.find((it) => it.username === username));
   const [isFollowed, setIsFollowed] =
     React.useState<boolean>(!!initialFollowed);
+  const justMutated = React.useRef(false);
   React.useEffect(() => {
+    if (justMutated.current) return;
+    const raw =
+      typeof window !== 'undefined' ? window.localStorage.getItem(lsKey) : null;
+    if (raw !== null) {
+      const val = raw === '1' || raw === 'true';
+      setIsFollowed(val);
+      return;
+    }
     const next =
       userEx?.isFollowedByMe === true ||
       (Array.isArray(myFollowing.data?.items) &&
         !!myFollowing.data?.items.find((it) => it.username === username));
     setIsFollowed(!!next);
-  }, [userEx?.isFollowedByMe, myFollowing.data?.items, username]);
+  }, [userEx?.isFollowedByMe, myFollowing.data?.items, username, lsKey]);
   const followMut = useMutation({
     mutationFn: async (next: boolean) =>
       next
         ? followUser(token as string, username as string)
         : unfollowUser(token as string, username as string),
     onMutate: async (next) => {
+      justMutated.current = true;
       setIsFollowed(next);
+      const prevRaw =
+        typeof window !== 'undefined'
+          ? window.localStorage.getItem(lsKey)
+          : null;
+      const prevLocal: boolean | null =
+        prevRaw === null
+          ? null
+          : prevRaw === '1' || prevRaw === 'true'
+            ? true
+            : prevRaw === '0' || prevRaw === 'false'
+              ? false
+              : null;
+      if (typeof window !== 'undefined')
+        window.localStorage.setItem(lsKey, next ? '1' : '0');
+      qc.setQueryData(
+        ['me', 'following', 1, 200],
+        (
+          prev: { items: { username: string; name?: string }[] } | undefined
+        ) => {
+          const base = prev ?? { items: [] };
+          const exists = base.items.some((it) => it.username === username);
+          if (next && !exists)
+            return { items: [...base.items, { username: username as string }] };
+          if (!next && exists)
+            return {
+              items: base.items.filter((it) => it.username !== username),
+            };
+          return base;
+        }
+      );
+      qc.setQueryData(
+        ['user', username],
+        (prev: (UserPublic & { isFollowedByMe?: boolean }) | undefined) => {
+          if (!prev) return prev;
+          const followers =
+            Math.max(prev.stats?.followers ?? 0, 0) + (next ? 1 : -1);
+          const stats = prev.stats
+            ? { ...prev.stats, followers: Math.max(followers, 0) }
+            : {
+                post: 0,
+                followers: Math.max(followers, 0),
+                following: 0,
+                likes: 0,
+              };
+          return { ...prev, stats, isFollowedByMe: next } as UserPublic & {
+            isFollowedByMe?: boolean;
+          };
+        }
+      );
+      return { prevLocal } as { prevLocal: boolean | null };
     },
-    onError: () => {
+    onError: (_err, next, ctx) => {
       setIsFollowed((prev) => !prev);
+      justMutated.current = false;
+      if (typeof window !== 'undefined') {
+        const v = (ctx as { prevLocal?: boolean | null })?.prevLocal;
+        if (typeof v === 'undefined' || v === null)
+          window.localStorage.removeItem(lsKey);
+        else window.localStorage.setItem(lsKey, v ? '1' : '0');
+      }
+      qc.invalidateQueries({ queryKey: ['me', 'following'] });
+      qc.invalidateQueries({ queryKey: ['user', username] });
     },
     onSuccess: () => {
+      justMutated.current = false;
       qc.invalidateQueries({ queryKey: ['me'] });
       qc.invalidateQueries({ queryKey: ['me', 'header'] });
       qc.invalidateQueries({ queryKey: ['me', 'following'] });
+      qc.invalidateQueries({ queryKey: ['user', username] });
     },
   });
   const hasPosts = (posts.data?.items?.length ?? 0) > 0;
