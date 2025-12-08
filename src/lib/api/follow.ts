@@ -69,7 +69,14 @@ export async function getFollowers(
   page = 1,
   limit = 20,
   token?: string
-): Promise<{ items: { username: string; name?: string }[] }> {
+): Promise<{
+  items: {
+    username: string;
+    name?: string;
+    avatarUrl?: string;
+    isFollowedByMe?: boolean;
+  }[];
+}> {
   const headers: HeadersInit = token
     ? { Authorization: `Bearer ${token}` }
     : {};
@@ -78,7 +85,51 @@ export async function getFollowers(
     { headers, cache: 'no-store' }
   );
   if (!res.ok) throw new Error('Failed to get followers');
-  return (await res.json()) as { items: { username: string; name?: string }[] };
+  const json = (await res.json().catch(() => ({}))) as
+    | Record<string, unknown>
+    | { items: unknown };
+  const root =
+    (typeof json === 'object' &&
+      json &&
+      (json as Record<string, unknown>)['data']) ||
+    json;
+  const direct =
+    (root && (root as Record<string, unknown>)['items']) ||
+    (root && (root as Record<string, unknown>)['followers']) ||
+    (root && (root as Record<string, unknown>)['users']) ||
+    root;
+  let arr: unknown[] = Array.isArray(direct)
+    ? (direct as unknown[])
+    : Array.isArray((direct as Record<string, unknown>)?.['items'])
+      ? (((direct as Record<string, unknown>)['items'] as unknown[]) ?? [])
+      : [];
+  if (arr.length === 0) {
+    arr =
+      findFirstArrayDeep(root, ['items', 'followers', 'users', 'list']) ?? [];
+  }
+  const items = arr
+    .filter((it) => it && typeof it === 'object')
+    .map((it) => {
+      const o = it as Record<string, unknown>;
+      const username =
+        findFirstStringDeep(o, ['username', 'user_name', 'handle']) || '';
+      const name = findFirstStringDeep(o, ['name', 'fullName', 'displayName']);
+      const avatarUrl = findFirstStringDeep(o, [
+        'avatarUrl',
+        'avatar_url',
+        'image',
+        'photo',
+        'profilePicture',
+        'profile_picture',
+      ]);
+      const isFollowedByMe =
+        (o['isFollowedByMe'] as boolean) ??
+        (o['followedByMe'] as boolean) ??
+        (o['isFollowing'] as boolean) ??
+        undefined;
+      return { username, name, avatarUrl, isFollowedByMe };
+    });
+  return { items };
 }
 
 export async function getFollowing(
@@ -86,7 +137,14 @@ export async function getFollowing(
   page = 1,
   limit = 20,
   token?: string
-): Promise<{ items: { username: string; name?: string }[] }> {
+): Promise<{
+  items: {
+    username: string;
+    name?: string;
+    avatarUrl?: string;
+    isFollowedByMe?: boolean;
+  }[];
+}> {
   const headers: HeadersInit = token
     ? { Authorization: `Bearer ${token}` }
     : {};
@@ -95,7 +153,51 @@ export async function getFollowing(
     { headers, cache: 'no-store' }
   );
   if (!res.ok) throw new Error('Failed to get following');
-  return (await res.json()) as { items: { username: string; name?: string }[] };
+  const json = (await res.json().catch(() => ({}))) as
+    | Record<string, unknown>
+    | { items: unknown };
+  const root =
+    (typeof json === 'object' &&
+      json &&
+      (json as Record<string, unknown>)['data']) ||
+    json;
+  const direct =
+    (root && (root as Record<string, unknown>)['items']) ||
+    (root && (root as Record<string, unknown>)['following']) ||
+    (root && (root as Record<string, unknown>)['users']) ||
+    root;
+  let arr: unknown[] = Array.isArray(direct)
+    ? (direct as unknown[])
+    : Array.isArray((direct as Record<string, unknown>)?.['items'])
+      ? (((direct as Record<string, unknown>)['items'] as unknown[]) ?? [])
+      : [];
+  if (arr.length === 0) {
+    arr =
+      findFirstArrayDeep(root, ['items', 'following', 'users', 'list']) ?? [];
+  }
+  const items = arr
+    .filter((it) => it && typeof it === 'object')
+    .map((it) => {
+      const o = it as Record<string, unknown>;
+      const username =
+        findFirstStringDeep(o, ['username', 'user_name', 'handle']) || '';
+      const name = findFirstStringDeep(o, ['name', 'fullName', 'displayName']);
+      const avatarUrl = findFirstStringDeep(o, [
+        'avatarUrl',
+        'avatar_url',
+        'image',
+        'photo',
+        'profilePicture',
+        'profile_picture',
+      ]);
+      const isFollowedByMe =
+        (o['isFollowedByMe'] as boolean) ??
+        (o['followedByMe'] as boolean) ??
+        (o['isFollowing'] as boolean) ??
+        undefined;
+      return { username, name, avatarUrl, isFollowedByMe };
+    });
+  return { items };
 }
 
 export async function getMyFollowers(

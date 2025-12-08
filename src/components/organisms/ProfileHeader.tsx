@@ -89,7 +89,11 @@ export default function ProfileHeader({
         </div>
         <div
           className='cursor-pointer'
-          onClick={() => router.push('/profile/followers')}
+          onClick={() =>
+            router.push(
+              uname ? `/users/${uname}/followers` : '/profile/followers'
+            )
+          }
           aria-label='go-followers'
         >
           <div className='text-xl font-display border-r border-neutral-800 pr-lg'>
@@ -101,7 +105,11 @@ export default function ProfileHeader({
         </div>
         <div
           className='cursor-pointer'
-          onClick={() => router.push('/profile/following')}
+          onClick={() =>
+            router.push(
+              uname ? `/users/${uname}/following` : '/profile/following'
+            )
+          }
           aria-label='go-following'
         >
           <div className='text-xl font-display border-r border-neutral-800 pr-lg'>
@@ -113,7 +121,9 @@ export default function ProfileHeader({
         </div>
         <div
           className='cursor-pointer'
-          onClick={() => router.push('/profile/likes')}
+          onClick={() =>
+            router.push(uname ? `/users/${uname}/likes` : '/profile/likes')
+          }
           aria-label='go-likes'
         >
           <div className='text-xl font-display pr-lg'>{stats?.likes ?? 0}</div>
