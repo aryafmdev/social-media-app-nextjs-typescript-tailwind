@@ -5,6 +5,9 @@ import { useQuery } from '@tanstack/react-query';
 import { searchUsers } from '../../lib/api/users';
 import Avatar from '../atoms/Avatar';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import AlertBanner from '../organisms/AlertBanner';
 
 type SearchBarProps = {
   placeholder?: string;
@@ -18,13 +21,14 @@ export default function SearchBar({
   const [query, setQuery] = useState('');
   const [debounced, setDebounced] = useState('');
   const router = useRouter();
+  const token = useSelector((s: RootState) => s.auth.token);
   useEffect(() => {
     const h = setTimeout(() => setDebounced(query.trim()), 200);
     return () => clearTimeout(h);
   }, [query]);
   const res = useQuery({
-    queryKey: ['users', 'search', debounced, 1, 20],
-    queryFn: () => searchUsers(debounced, 1, 20),
+    queryKey: ['users', 'search', debounced, 1, 20, token ? 'auth' : 'anon'],
+    queryFn: () => searchUsers(debounced, 1, 20, token ?? undefined),
     enabled: debounced.length > 0,
   });
 
@@ -97,13 +101,32 @@ export default function SearchBar({
 
       {onCloseAction && (
         <button onClick={onCloseAction} aria-label='close-search'>
-          <Icon icon='lucide:x' className='text-primary-100 size-6 md:hidden cursor-pointer' />
+          <Icon
+            icon='lucide:x'
+            className='text-primary-100 size-6 md:hidden cursor-pointer'
+          />
         </button>
       )}
 
       {debounced.length > 0 && (
-        <div className='absolute h-screen flex items-center justify-center top-full left-0 w-full bg-black px-xl py-xl'>
-          {ranked.length === 0 ? (
+        <div className='absolute h-screen top-full left-0 w-full bg-black px-xl py-xl'>
+          <div className='mb-md text-neutral-400 text-sm font-bold'>Users</div>
+          {res.isError ? (
+            <AlertBanner
+              variant='danger'
+              label={
+                res.error instanceof Error ? res.error.message : 'Search failed'
+              }
+            />
+          ) : res.isFetching || res.isPending ? (
+            <div className='flex items-center justify-center py-2xl text-neutral-25 gap-sm'>
+              <Icon
+                icon='line-md:loading-twotone-loop'
+                className='size-5 animate-spin'
+              />
+              Loading...
+            </div>
+          ) : ranked.length === 0 ? (
             <div className='text-center py-2xl'>
               <div className='text-neutral-25 font-bold text-md'>
                 No results found

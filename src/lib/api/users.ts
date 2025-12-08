@@ -45,12 +45,27 @@ export async function getUserLikes(
 
 export async function searchUsers(
   q: string,
+  page?: number,
+  limit?: number
+): Promise<{ items: UserSummary[] }>;
+export async function searchUsers(
+  q: string,
+  page?: number,
+  limit?: number,
+  token?: string
+): Promise<{ items: UserSummary[] }>;
+export async function searchUsers(
+  q: string,
   page = 1,
-  limit = 20
+  limit = 20,
+  token?: string
 ): Promise<{ items: UserSummary[] }> {
   const res = await fetch(
     `/api/users/search?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`,
-    { cache: 'no-store' }
+    {
+      cache: 'no-store',
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    }
   );
   if (!res.ok) throw new Error('Failed to search users');
   return (await res.json()) as { items: UserSummary[] };
