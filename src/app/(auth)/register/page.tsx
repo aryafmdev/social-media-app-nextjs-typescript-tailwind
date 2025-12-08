@@ -65,7 +65,11 @@ export default function RegisterPage() {
       const token = raw?.token;
       dispatch(setAuth({ token, user }));
       saveAuth(token, user);
-      router.push('/login?registered=1');
+      if (token) {
+        router.push('/');
+      } else {
+        router.push('/login?registered=1');
+      }
     },
     onError: (err) => {
       const label = err instanceof Error ? err.message : 'Register gagal';
