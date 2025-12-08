@@ -1,7 +1,14 @@
 'use client';
 import ProfileTemplate from '../../../components/templates/ProfileTemplate';
-import Header from '../../../components/organisms/Header';
-import ProfileEditForm from '../../../components/molecules/ProfileEditForm';
+import dynamic from 'next/dynamic';
+const HeaderNoSSR = dynamic(
+  () => import('../../../components/organisms/Header'),
+  { ssr: false }
+);
+const ProfileEditFormNoSSR = dynamic(
+  () => import('../../../components/molecules/ProfileEditForm'),
+  { ssr: false }
+);
 import { useQuery } from '@tanstack/react-query';
 import { getMe } from '../../../lib/api/me';
 import { useSelector } from 'react-redux';
@@ -83,9 +90,9 @@ export default function EditProfilePage() {
   }, [reduxUser, me.data, saved?.user]);
   return (
     <main className='min-h-screen bg-neutral-950'>
-      <Header variant='mobile-edit-profile' />
+      <HeaderNoSSR variant='mobile-edit-profile' />
       <ProfileTemplate>
-        <ProfileEditForm
+        <ProfileEditFormNoSSR
           me={meProp}
           prefill={prefill}
           onDoneAction={() => router.replace('/profile?updated=1')}

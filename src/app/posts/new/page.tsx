@@ -1,7 +1,14 @@
 "use client";
-import Header from "../../../components/organisms/Header";
+import dynamic from "next/dynamic";
+const HeaderNoSSR = dynamic(
+  () => import("../../../components/organisms/Header"),
+  { ssr: false }
+);
 import ProfileTemplate from "../../../components/templates/ProfileTemplate";
-import AddPostForm from "../../../components/molecules/AddPostForm";
+const AddPostFormNoSSR = dynamic(
+  () => import("../../../components/molecules/AddPostForm"),
+  { ssr: false }
+);
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { useEffect } from "react";
@@ -17,9 +24,9 @@ export default function NewPostPage() {
   }, [token, router]);
   return (
     <main className="min-h-screen bg-neutral-950">
-      <Header variant='mobile-edit-profile' title='Add Post' />
+      <HeaderNoSSR variant='mobile-edit-profile' title='Add Post' />
       <ProfileTemplate>
-        <AddPostForm />
+        <AddPostFormNoSSR />
       </ProfileTemplate>
     </main>
   );
