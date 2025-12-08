@@ -1,7 +1,7 @@
 'use client';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Header from '../../components/organisms/Header';
 import ProfileTemplate from '../../components/templates/ProfileTemplate';
 import ProfileHeader from '../../components/organisms/ProfileHeader';
@@ -29,6 +29,8 @@ function ProfilePageContent() {
   const token = useSelector((s: RootState) => s.auth.token);
   const reduxUser = useSelector((s: RootState) => s.auth.user);
   const router = useRouter();
+  const pathname = usePathname();
+  const sp = useSearchParams();
   const [tab, setTab] = useState<ProfileTab>('gallery');
   const [hasPostsOverride, setHasPostsOverride] = useState<boolean | null>(
     null
@@ -65,6 +67,19 @@ function ProfilePageContent() {
     queryFn: () => getMySaved(effectiveToken as string, 1, 20),
     enabled: !!effectiveToken,
   });
+  const updatedFlag = sp.get('updated') === '1';
+  useEffect(() => {
+    if (!updatedFlag) return;
+    const t = setTimeout(() => {
+      const next = new URLSearchParams(
+        typeof window !== 'undefined' ? window.location.search : ''
+      );
+      next.delete('updated');
+      const qs = next.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname);
+    }, 1000);
+    return () => clearTimeout(t);
+  }, [updatedFlag, pathname, router]);
   const hasPosts = ((hasPostsOverride ?? (me.data?.stats?.post ?? 0) > 0) ||
     (posts.data?.items?.length ?? 0) > 0) as boolean;
 
@@ -83,7 +98,7 @@ function ProfilePageContent() {
           stats={me.data?.stats}
           onEdit={() => router.push('/profile/edit')}
         />
-        {useSearchParams().get('updated') === '1' && (
+        {updatedFlag && (
           <AlertBanner variant='success' label='Profile Success Update' />
         )}
         <ProfileTabs active={tab} onChange={setTab} />
