@@ -53,25 +53,25 @@ Use the following dummy account to log in and explore the features:
 ![Add Post Page](public/sociality-add-post-page.jpeg)
 
 ### 📖 Detail Post Page  
-![Detail Post Page](/sociality-detail-post-page.jpeg)
+![Detail Post Page](public/sociality-detail-post-page.jpeg)
 
 ### 💬 Comment Page  
-![Comment Page](/sociality-comment-page.jpeg)
+![Comment Page](public/sociality-comment-page.jpeg)
 
 ### 👤 Profile Page  
-![Profile Page](/sociality-profile-page.jpeg)
+![Profile Page](public/sociality-profile-page.jpeg)
 
 ### 🧾 Profile Fill Page  
-![Profile Fill Page](/sociality-profile-fill-page.jpeg)
+![Profile Fill Page](public/sociality-profile-fill-page.jpeg)
 
 ### 🛠️ Edit Profile Page  
-![Edit Profile Page](/sociality-edit-profile-page.jpeg)
+![Edit Profile Page](public/sociality-edit-profile-page.jpeg)
 
 ### 🔐 Login Page  
-![Login Page](/sociality-login-page.jpeg)
+![Login Page](public/sociality-login-page.jpeg)
 
 ### 📝 Register Page  
-![Register Page](/sociality-register-page.jpeg)
+![Register Page](public/sociality-register-page.jpeg)
 
 ---
 
