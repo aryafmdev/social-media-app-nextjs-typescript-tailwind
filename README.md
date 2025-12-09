@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📱 Sociality — Social Media Web App
 
-## Getting Started
+A modern, scalable **React + TypeScript + Vite** Social Media Application built with atomic design principles.  
+This project is designed to be **audit‑ready**, mentor‑compatible, and focused on clean architecture.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌐 Live Demo
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+👉 Try the application here: [Sociality Web](https://socialmediaappnextjstypescripttailw.vercel.app/)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Use the following dummy account to log in and explore the features:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Email:** `johndoe@example.com`  
+- **Password:** `123456`
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## ✨ Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- 🔐 Authentication (Register, Login, Forgot Password)  
+- 📝 Create, edit, and delete posts  
+- 💬 Comment system with optimistic updates  
+- ❤️ Like & Save posts (localStorage persistence)  
+- 👥 Follow & Unfollow users with instant stats sync  
+- 🔍 Search bar for users & posts  
+- 📂 User Profile with activity & stats  
+- 📰 Infinite scroll feed with empty state logic  
+- 🎨 Responsive UI (Mobile ≤393px, Desktop ≥md)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🛠 Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- ⚛️ **Next.js + TypeScript → core framework & dev server 
+- 🎨 **Tailwind CSS + shadcn/ui** → styling & UI components  
+- 🔄 **Redux Toolkit** → global auth state (token, user info)  
+- 📡 **TanStack Query** → API fetching & caching  
+- ⏰ **Day.js** → date formatting & validation  
+- 📬 **Axios** → API client  
+- ✅ **Zod + React Hook Form** → form validation & type safety  
+- 🔄 **Optimistic UI** → instant feedback for likes, comments, follow/unfollow  
+- 🛠 **Next.js routing (if Next) → multi‑page navigation (Feed, Profile, Search, Login, Register)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📸 Preview Sociality App
+
+### 🏠 Feed Page  
+![Feed Page](/sociality-feed-page.jpeg)
+
+### 📝 Add Post Page  
+![Add Post Page](/sociality-add-post-page.jpeg)
+
+### 📖 Detail Post Page  
+![Detail Post Page](/sociality-detail-post-page.jpeg)
+
+### 💬 Comment Page  
+![Comment Page](/sociality-comment-page.jpeg)
+
+### 👤 Profile Page  
+![Profile Page](/sociality-profile-page.jpeg)
+
+### 🧾 Profile Fill Page  
+![Profile Fill Page](/sociality-profile-fill-page.jpeg)
+
+### 🛠️ Edit Profile Page  
+![Edit Profile Page](/sociality-edit-profile-page.jpeg)
+
+### 🔐 Login Page  
+![Login Page](/sociality-login-page.jpeg)
+
+### 📝 Register Page  
+![Register Page](/sociality-register-page.jpeg)
+
+---
+
+## 📌 Notes
+
+- Breakpoints: Mobile ≤393px, Desktop ≥md  
+- Optimistic UI for likes, comments, and follow actions  
+- Audit‑ready commit logs with clear breakdown per feature  
+- Client‑only components for identity & browser API access
