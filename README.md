@@ -47,10 +47,10 @@ Use the following dummy account to log in and explore the features:
 ## 📸 Preview Sociality App
 
 ### 🏠 Feed Page  
-![Feed Page](/sociality-feed-page.jpeg)
+![Feed Page](public/sociality-feed-page.jpeg)
 
 ### 📝 Add Post Page  
-![Add Post Page](/sociality-add-post-page.jpeg)
+![Add Post Page](public/sociality-add-post-page.jpeg)
 
 ### 📖 Detail Post Page  
 ![Detail Post Page](/sociality-detail-post-page.jpeg)
