@@ -169,7 +169,7 @@ export default function CommentsDrawer({ open, onCloseAction, postId }: Props) {
             )}
           </div>
           <div className='absolute flex inset-x-0 bottom-10 py-md bg-neutral-950 gap-md'>
-            <div className='flex items-center bg-neutral-950 border border-neutral-800 h-[48px] px-lg rounded-xl mb-sm'>
+            <div className='flex items-center bg-neutral-950 border border-neutral-800 h-[48px] ml-xl px-lg rounded-xl mb-sm'>
               <button
                 type='button'
                 className='flex items-center text-2xl justify-center text-neutral-50 hover:text-neutral-25'
@@ -179,7 +179,7 @@ export default function CommentsDrawer({ open, onCloseAction, postId }: Props) {
                 <Icon icon='fluent:emoji-24-regular' />
               </button>
             </div>
-            <div className='rounded-xl w-full bg-neutral-950 border border-neutral-800 h-[48px] px-lg flex items-center gap-md'>
+            <div className='rounded-xl w-full bg-neutral-950 mr-xl border border-neutral-800 h-[48px] px-lg flex items-center gap-md'>
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
