@@ -1,6 +1,6 @@
 # 📱 Sociality — Social Media Web App
 
-A modern, scalable **React + TypeScript + Vite** Social Media Application built with atomic design principles.  
+A modern, scalable **NextJS + TypeScript** Social Media Application built with atomic design principles.  
 This project is designed to be **audit‑ready**, mentor‑compatible, and focused on clean architecture.
 
 ---
